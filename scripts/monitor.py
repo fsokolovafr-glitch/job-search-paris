@@ -1,4 +1,4 @@
-"""Conservative job monitor. Python 3.9+, standard library only."""
+"""Monitor three job platforms, never employer sites. Python 3.9+."""
 import argparse
 import copy
 import hashlib
@@ -7,14 +7,21 @@ import os
 import re
 import time
 import unicodedata
-from datetime import date, datetime, timezone
+from history_store import HistoryStore
+from datetime import date, datetime, timedelta, timezone
 from html.parser import HTMLParser
+from itertools import zip_longest
 from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
-from urllib.request import Request, urlopen
+from urllib.parse import parse_qsl, urlencode, urljoin, urlsplit, urlunsplit
+from urllib.request import Request, build_opener, HTTPRedirectHandler
 
 ROOT = Path(__file__).resolve().parents[1]
+PLATFORMS = {
+    'linkedin': ('linkedin.com',),
+    'indeed': ('indeed.com', 'indeed.fr'),
+    'welcome_to_the_jungle': ('welcometothejungle.com',),
+}
 
 
 def read_json(path):
@@ -34,16 +41,46 @@ def normalize(text):
                             if not unicodedata.combining(c)).split())
 
 
+def platform_for(url):
+    """Hard allowlist. Config cannot expand the set of permitted sites."""
+    try:
+        p = urlsplit(url)
+        if p.scheme != 'https' or p.username or p.password or p.port not in (None, 443):
+            return None
+        host = p.hostname or ''
+        for name, domains in PLATFORMS.items():
+            if any(host == d or host.endswith('.' + d) for d in domains):
+                if name == 'linkedin' and re.match(r'^/jobs/view/[^/]+', p.path):
+                    return name
+                if name == 'indeed' and p.path in ('/viewjob', '/rc/clk'):
+                    return name
+                if name == 'welcome_to_the_jungle' and re.match(r'^/[^/]+/companies/[^/]+/jobs/[^/]+', p.path):
+                    return name
+    except (ValueError, TypeError):
+        pass
+    return None
+
+
 def canonical(url):
+    """Deduplication key only; never use this key as a replacement request URL."""
     p = urlsplit(url)
     if p.scheme not in ('https', 'http') or not p.hostname or p.username or p.password:
-        raise ValueError('Expected a public HTTP(S) URL')
+        raise ValueError('Invalid HTTP URL')
     query = [(k, v) for k, v in parse_qsl(p.query, keep_blank_values=True)
              if not k.lower().startswith('utm_') and k.lower() not in ('gclid', 'fbclid')]
-    return urlunsplit((p.scheme.lower(), p.netloc.lower(), p.path.rstrip('/') or '/',
-                       urlencode(sorted(query)), ''))
+    return urlunsplit((p.scheme.lower(), p.netloc.lower(), p.path, urlencode(sorted(query)), ''))
 
 
+def has_phrase(text, phrase):
+    return bool(re.search(r'(?<!\w)' + re.escape(normalize(phrase)) + r'(?!\w)', normalize(text)))
+
+
+def title_matches(title, config):
+    text = normalize(title)
+    # Early-stage describes the company, not a French internship.
+    exclusion_text = re.sub(r'\bearly[ -]stage\b', '', text)
+    return (any(has_phrase(text, term) for term in config['role_keywords']) and
+            not any(has_phrase(exclusion_text, term) for term in config['excluded_keywords']))
 class JsonLD(HTMLParser):
     def __init__(self):
         super().__init__()
@@ -103,43 +140,48 @@ def countries(value):
     return result
 
 
-def matching_job(job, company, config):
+
+def eligible(job, config):
     employer = job.get('hiringOrganization', {})
     employer = employer.get('name', '') if isinstance(employer, dict) else ''
-    aliases = [company['company']] + company.get('aliases', [])
-    if normalize(employer) not in [normalize(a) for a in aliases]:
-        return False
-    title = normalize(job.get('title', ''))
-    if not any(normalize(term) in title for term in config['role_keywords']):
-        return False
-    if any(normalize(term) in title for term in config.get('excluded_keywords', [])):
-        return False
     locations = countries(job.get('jobLocation', [])) + countries(job.get('applicantLocationRequirements', []))
-    return bool(set(locations) & set(map(normalize, config['country_aliases'])))
+    return (bool(employer) and title_matches(job.get('title', ''), config) and
+            bool(set(locations) & set(map(normalize, config['country_aliases']))))
 
 
-def classify(page, company, config, today, expected_title=None):
-    code = page.get('status', 0)
-    if code in (404, 410):
-        return 'CLOSED', 'HTTP ' + str(code), None
-    if code != 200:
-        return 'UNKNOWN', 'HTTP ' + str(code) if code else page.get('error', 'fetch_failed'), None
-    if page.get('redirected'):
-        return 'UNKNOWN', 'redirect_requires_review', None
-    matching = [j for j in job_postings(page.get('body', '')) if matching_job(j, company, config)]
-    if expected_title:
-        matching = [j for j in matching if normalize(j.get('title', '')) == normalize(expected_title)]
-    if len(matching) != 1:
+def classify(page, config, now, expected=None):
+    status = page.get('status', 0)
+    if status in (404, 410):
+        return 'CLOSED', 'HTTP ' + str(status), None
+    if status != 200:
+        return 'UNKNOWN', page.get('error', 'HTTP ' + str(status)), None
+    candidates = [j for j in job_postings(page.get('body', '')) if eligible(j, config)]
+    if expected:
+        candidates = [j for j in candidates if normalize(j.get('title')) == normalize(expected['title'])
+                      and normalize(j['hiringOrganization']['name']) == normalize(expected['company'])]
+    if len(candidates) != 1:
         return 'UNKNOWN', 'missing_or_ambiguous_matching_JobPosting', None
-    job = matching[0]
+    job = candidates[0]
     expires = job.get('validThrough')
     if expires:
         try:
-            if date.fromisoformat(str(expires)[:10]) < today:
+            text = str(expires)
+            if len(text) == 10:
+                end = datetime.combine(date.fromisoformat(text) + timedelta(days=1), datetime.min.time(), tzinfo=timezone.utc)
+            else:
+                end = datetime.fromisoformat(text.replace('Z', '+00:00'))
+                if end.tzinfo is None:
+                    return 'UNKNOWN', 'expiration_timezone_missing', job
+            if end <= now:
                 return 'CLOSED', 'JobPosting.validThrough_expired', job
         except ValueError:
             return 'UNKNOWN', 'invalid_validThrough', job
     return 'LIVE', 'matching_JobPosting', job
+
+
+class NoRedirect(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
 
 
 class LiveProvider:
@@ -147,210 +189,231 @@ class LiveProvider:
         self.config = config
         self.key = os.environ.get('BRAVE_SEARCH_API_KEY')
         if not self.key:
-            raise ValueError('Set BRAVE_SEARCH_API_KEY for live mode; no data was changed.')
+            raise ValueError('Set BRAVE_SEARCH_API_KEY; no monitoring data was changed.')
+        self.opener = build_opener(NoRedirect())
 
-    def search(self, company):
-        results = []
-        sources = []
-        for term in self.config['search_terms']:
-            query = '"{}" "{}" {}'.format(company['company'], term, self.config['country'])
-            sources.append('https://search.brave.com/search?' + urlencode({'q': query}))
-            for offset in range(self.config.get('search_pages', 1)):
-                time.sleep(1.1)
-                params = urlencode({'q': query, 'country': self.config['country_code'], 'count': 20, 'offset': offset})
-                req = Request('https://api.search.brave.com/res/v1/web/search?' + params,
-                              headers={'X-Subscription-Token': self.key, 'Accept': 'application/json'})
-                try:
-                    with urlopen(req, timeout=30) as response:
-                        payload = json.load(response)
-                except (HTTPError, URLError, TimeoutError, OSError, ValueError) as error:
-                    raise RuntimeError('search_failed:' + type(error).__name__) from None
-                if not isinstance(payload, dict) or 'error' in payload:
-                    raise RuntimeError('invalid_search_response')
-                results.extend(payload.get('web', {}).get('results', []))
-                if not payload.get('query', {}).get('more_results_available', False):
-                    break
-        return results, sources
+    def search(self):
+        """One global search per platform/role, independent of company count."""
+        hits, errors, sources = [], [], []
+        queries = 0
+        for platform, domains in PLATFORMS.items():
+            scope = '(' + ' OR '.join('site:' + d for d in domains) + ')'
+            for term in self.config['search_terms']:
+                query = '{} "{}" {}'.format(scope, term, self.config['country'])
+                sources.append({'platform': platform, 'query': query})
+                queries += 1
+                params = urlencode({'q': query, 'country': self.config['country_code'], 'count': 20})
+                success = False
+                for attempt in range(3):
+                    time.sleep(1.1 * (2 ** attempt))
+                    request = Request('https://api.search.brave.com/res/v1/web/search?' + params,
+                                      headers={'X-Subscription-Token': self.key, 'Accept': 'application/json'})
+                    try:
+                        with self.opener.open(request, timeout=25) as response:
+                            payload = json.load(response)
+                        if not isinstance(payload, dict) or 'error' in payload:
+                            raise ValueError('Invalid search payload')
+                        hits.extend(payload.get('web', {}).get('results', []))
+                        success = True
+                        break
+                    except HTTPError as error:
+                        if error.code not in (429, 500, 502, 503, 504):
+                            break
+                    except (URLError, TimeoutError, OSError, ValueError):
+                        pass
+                if not success:
+                    errors.append({'platform': platform, 'query': query, 'reason': 'search_failed'})
+        return {'hits': hits, 'errors': errors, 'queries': sources, 'query_count': queries}
 
     def fetch(self, url):
-        try:
-            req = Request(canonical(url), headers={'User-Agent': 'JobSearchParis/1.0', 'Accept': 'text/html'})
-            with urlopen(req, timeout=25) as response:
-                body = response.read(3_000_001)
-                if len(body) > 3_000_000:
-                    return {'status': 0, 'error': 'page_too_large'}
-                return {'status': response.status, 'body': body.decode('utf-8', errors='replace'),
-                        'redirected': canonical(response.url) != canonical(url)}
-        except HTTPError as error:
-            # An error at a redirected destination does not prove the original role closed.
-            return {'status': error.code if canonical(error.url) == canonical(url) else 0,
-                    'error': 'redirect_http_error'}
-        except (URLError, TimeoutError, OSError, ValueError):
-            return {'status': 0, 'error': 'fetch_failed'}
+        current = url
+        # Follow at most five redirects, checking BEFORE every request.
+        for _ in range(6):
+            if not platform_for(current):
+                return {'status': 0, 'error': 'blocked_outside_allowed_job_pages'}
+            for attempt in range(3):
+                try:
+                    req = Request(current, headers={'User-Agent': 'JobSearchParis/2.0', 'Accept': 'text/html'})
+                    with self.opener.open(req, timeout=20) as response:
+                        body = response.read(3_000_001)
+                        if len(body) > 3_000_000:
+                            return {'status': 0, 'error': 'page_too_large'}
+                        return {'status': response.status, 'body': body.decode('utf-8', errors='replace'), 'final_url': current}
+                except HTTPError as error:
+                    if error.code in (301, 302, 303, 307, 308):
+                        target = error.headers.get('Location')
+                        if not target:
+                            return {'status': 0, 'error': 'redirect_without_location'}
+                        current = urljoin(current, target)
+                        break
+                    if error.code in (429, 500, 502, 503, 504) and attempt < 2:
+                        time.sleep(2 ** attempt)
+                        continue
+                    # A missing redirected target does not prove the saved listing closed.
+                    if current != url and error.code in (404, 410):
+                        return {'status': 0, 'error': 'redirect_target_missing'}
+                    return {'status': error.code}
+                except (URLError, TimeoutError, OSError, ValueError):
+                    if attempt < 2:
+                        time.sleep(2 ** attempt)
+                        continue
+                    return {'status': 0, 'error': 'fetch_failed'}
+        return {'status': 0, 'error': 'redirect_limit'}
 
 
 class MockProvider:
     def __init__(self, fixture):
         self.fixture = fixture
+        self.fetched = []
+        self.search_calls = 0
 
-    def search(self, company):
-        entry = self.fixture.get('search', {}).get(company['company'])
-        if entry is None:
-            raise RuntimeError('missing_mock_search_fixture')
-        if isinstance(entry, dict) and 'error' in entry:
-            raise RuntimeError(entry['error'])
-        return entry, []
+    def search(self):
+        self.search_calls += 1
+        return copy.deepcopy(self.fixture['search'])
 
     def fetch(self, url):
-        return self.fixture.get('pages', {}).get(canonical(url), {'status': 0, 'error': 'missing_mock_page'})
+        self.fetched.append(url)
+        return copy.deepcopy(self.fixture['pages'].get(url, {'status': 0, 'error': 'missing_mock_page'}))
 
 
-def validate(companies):
-    if not isinstance(companies, list):
-        raise ValueError('shortlist must be a JSON array')
-    names = set()
+def validate(jobs):
+    if not isinstance(jobs, list):
+        raise ValueError('jobs must be a JSON array')
+    seen = set()
+    for job in jobs:
+        key = canonical(job['url'])
+        if key in seen or not job.get('title') or not job.get('company') or type(job.get('applied')) is not bool:
+            raise ValueError('Invalid or duplicate job')
+        if job.get('status') not in ('UNKNOWN', 'LIVE', 'CLOSED'):
+            raise ValueError('Invalid status')
+        seen.add(key)
+
+
+def monitor(jobs, companies, config, provider, now):
+    validate(jobs)
+    jobs = copy.deepcopy(jobs)
+    result = {'date': now.date().isoformat(), 'checked_at': now.isoformat(), 'new': [], 'closed': [],
+              'reopened': [], 'unknown': [], 'excluded': [], 'observations': [], 'sources': [],
+              'pages_checked': 0, 'live_jobs': 0, 'platforms': list(PLATFORMS)}
+    priority = set()
+    rejected = set()
     for company in companies:
-        name = normalize(company['company'])
-        if not name or name in names:
-            raise ValueError('duplicate or empty company name')
-        names.add(name)
-        if company['track'] not in ('A', 'B', 'C'):
-            raise ValueError('track must be A, B or C')
-        if company.get('monitoring_status') not in ('found_not_applied', 'checked', 'paused', 'rejected'):
-            raise ValueError('invalid monitoring_status')
-        seen = set()
-        for job in company['open_roles']:
-            url = canonical(job['url'])
-            if url in seen or not job.get('title') or type(job.get('applied')) is not bool:
-                raise ValueError('invalid or duplicate job')
-            if job.get('status') not in ('UNKNOWN', 'LIVE', 'CLOSED'):
-                raise ValueError('invalid job status')
-            seen.add(url)
-
-
-def monitor(companies, config, provider, now):
-    validate(companies)
-    companies = copy.deepcopy(companies)
-    day = now.date()
-    result = {'date': day.isoformat(), 'checked_at': now.isoformat(), 'companies_checked': 0,
-              'companies_skipped': 0, 'new': [], 'closed': [], 'reopened': [], 'unknown': [],
-              'large': [], 'sources': [], 'observations': [], 'live_jobs': 0}
-    for company in companies:
-        if company.get('contact_status') == 'rejected' or company['monitoring_status'] in ('rejected', 'paused'):
-            result['companies_skipped'] += 1
+        names = [normalize(company['company'])] + list(map(normalize, company.get('aliases', [])))
+        if company.get('contact_status') == 'rejected' or company.get('monitoring_status') in ('rejected', 'paused'):
+            rejected.update(names)
+        else:
+            priority.update(names)
+    search = provider.search()
+    result['search_queries'] = search['queries']
+    result['query_count'] = search['query_count']
+    for err in search['errors']:
+        result['unknown'].append(dict(err, company=err.get('platform', ''), title='WebSearch', url=''))
+    known = {canonical(j['url']): j for j in jobs}
+    queue = []
+    queued = set()
+    for job in sorted(jobs, key=lambda item: item.get('last_checked', '')):
+        if job['status'] == 'CLOSED' and not job['applied'] and job.get('application_status') != 'rejected':
+            continue  # Recheck a closed listing only if search finds it again.
+        if job['applied'] or job.get('application_status') == 'rejected' or normalize(job['company']) in rejected:
+            queued.add(canonical(job['url']))
+        else:
+            queue.append((job['url'], job))
+            queued.add(canonical(job['url']))
+    saved_queue = queue
+    queue = []
+    for hit in search['hits']:
+        url = hit.get('url', '')
+        if not platform_for(url):
+            result['excluded'].append({'url': url, 'reason': 'outside_allowed_job_pages'})
             continue
-        large = company['track'] in ('A', 'B') and (company.get('employee_count') or 0) >= 1000
-        result['companies_checked'] += 1
-        company['last_checked'] = day.isoformat()
-        errors_before = len(result['unknown'])
-        changes_before = len(result['new']) + len(result['closed']) + len(result['reopened'])
-        known = {canonical(j['url']): j for j in company['open_roles']}
-        inspected = set()
-
-        def inspect(url, job=None):
-            url = canonical(url)
-            if url in inspected:
-                return
-            inspected.add(url)
-            result['sources'].append(url)
-            page = provider.fetch(url)
-            status, reason, posting = classify(page, company, config, day, job['title'] if job else None)
-            evidence = {'company': company['company'], 'url': url, 'status': status,
-                        'reason': reason, 'checked_at': now.isoformat(),
-                        'content_sha256': hashlib.sha256(page.get('body', '').encode()).hexdigest()}
-            result['observations'].append(evidence)
-            if job is None:
-                if status != 'LIVE':
-                    if status == 'UNKNOWN':
-                        result['unknown'].append(dict(evidence, title='Кандидат из поиска: требуется проверка'))
-                    return
-                job = {'title': posting['title'], 'url': url, 'status': 'UNKNOWN',
-                       'found_date': day.isoformat(), 'applied': False}
-                company['open_roles'].append(job)
-                known[url] = job
-                result['new'].append(dict(evidence, title=job['title']))
-            old_status = job['status']
-            job['last_checked'] = day.isoformat()
-            job['last_check_status'] = status
-            job['evidence'] = evidence
-            if status == 'UNKNOWN':
-                result['unknown'].append(dict(evidence, title=job['title']))
-                # Keep the last confirmed state; this run's uncertainty remains explicit.
-                return
-            job['status'] = status
-            if status == 'CLOSED' and old_status != 'CLOSED':
-                result['closed'].append(dict(evidence, title=job['title']))
-            if status == 'LIVE':
-                result['live_jobs'] += 1
-                if old_status == 'CLOSED':
-                    result['reopened'].append(dict(evidence, title=job['title']))
-
-        for job in list(company['open_roles']):
-            if not job['applied'] and job.get('application_status') != 'rejected':
-                inspect(job['url'], job)
-        # Found: check saved roles; Checked and large A/B: also discover new roles.
-        if company['monitoring_status'] == 'checked' or large:
-            try:
-                hits, search_sources = provider.search(company)
-                result['sources'].extend(search_sources)
-                for hit in hits:
-                    url = hit.get('url', '')
-                    try:
-                        key = canonical(url)
-                    except ValueError:
-                        continue
-                    existing = known.get(key)
-                    if existing and (existing['applied'] or existing.get('application_status') == 'rejected'):
-                        continue
-                    title = normalize(hit.get('title', ''))
-                    if existing or any(normalize(t) in title for t in config['role_keywords']):
-                        inspect(key, existing)
-            except RuntimeError as error:
-                result['unknown'].append({'company': company['company'], 'title': 'WebSearch',
-                                          'url': '', 'reason': str(error)})
-        company['last_check_status'] = 'partial' if len(result['unknown']) > errors_before else 'completed'
-        if large:
-            delta = len(result['new']) + len(result['closed']) + len(result['reopened']) - changes_before
-            result['large'].append({'company': company['company'], 'changes': delta,
-                                    'status': company['last_check_status']})
+        key = canonical(url)
+        if key not in queued:
+            queue.append((url, known.get(key)))
+            queued.add(key)
+    queue = [item for pair in zip_longest(saved_queue, queue) for item in pair if item is not None]
+    for url, job in queue:
+        if not platform_for(url):
+            result['excluded'].append({'url': url, 'reason': 'outside_allowed_job_pages'})
+            continue
+        if result['pages_checked'] >= config['max_pages_per_run']:
+            result['unknown'].append({'company': job['company'] if job else '', 'title': job['title'] if job else 'Кандидат',
+                                      'url': url, 'reason': 'page_budget_exceeded'})
+            continue
+        page = provider.fetch(url)
+        result['pages_checked'] += 1
+        result['sources'].append(url)
+        if page.get('final_url') and platform_for(page['final_url']):
+            result['sources'].append(page['final_url'])
+        status, reason, posting = classify(page, config, now, job)
+        evidence = {'url': url, 'status': status, 'reason': reason, 'checked_at': now.isoformat(),
+                    'content_sha256': hashlib.sha256(page.get('body', '').encode()).hexdigest()}
+        result['observations'].append(evidence)
+        if not job:
+            if status != 'LIVE':
+                if status == 'UNKNOWN':
+                    result['unknown'].append(dict(evidence, company='', title='Кандидат: требуется проверка'))
+                continue
+            employer = posting['hiringOrganization']['name']
+            if normalize(employer) in rejected:
+                continue
+            job = {'company': employer, 'title': posting['title'], 'url': url, 'status': 'UNKNOWN',
+                   'found_date': result['date'], 'applied': False}
+            jobs.append(job)
+            result['new'].append(dict(evidence, company=employer, title=job['title'], priority=normalize(employer) in priority))
+        previous = job['status']
+        job['platform'] = platform_for(url)
+        job['priority_company'] = normalize(job['company']) in priority
+        job['last_checked'] = result['date']
+        job['last_check_status'] = status
+        job['evidence'] = evidence
+        event = dict(evidence, company=job['company'], title=job['title'], priority=job['priority_company'])
+        if status == 'UNKNOWN':
+            result['unknown'].append(event)
+            continue
+        job['status'] = status
+        if status == 'CLOSED' and previous != 'CLOSED':
+            result['closed'].append(event)
+        if status == 'LIVE':
+            result['live_jobs'] += 1
+            if previous == 'CLOSED':
+                result['reopened'].append(event)
     result['sources'] = sorted(set(result['sources']))
     result['new_jobs_found'] = len(result['new'])
     result['jobs_closed'] = len(result['closed'])
     result['status'] = 'partial' if result['unknown'] else 'completed'
-    return companies, result
-
-
-def md_text(value):
-    return str(value).replace('\n', ' ').replace('[', '\\[').replace(']', '\\]')
+    return jobs, result
 
 
 def report(result, mode):
-    lines = ['# Monitoring Report — ' + result['date'], '',
-             '**Режим: {}. Статус: {}.**'.format(mode.upper(), result['status']),
-             'MOCK — искусственные данные; не является проверкой реальных вакансий.' if mode == 'mock'
-             else 'Подтверждение LIVE: подходящий JobPosting на момент проверки; полнота WebSearch не гарантируется.', '']
-    for title, key in [('Новые вакансии (найдено)', 'new'), ('Закрытые вакансии', 'closed'),
+    lines = ['# Monitoring Report — ' + result['date'], '', '**{} / {}**'.format(mode.upper(), result['status']),
+             'Площадки: LinkedIn Jobs, Indeed, Welcome to the Jungle. Сайты компаний не открываются.',
+             'MOCK: искусственные данные.' if mode == 'mock' else 'LIVE подтверждает подходящую разметку на момент проверки; полнота поиска не гарантируется.', '']
+    for title, key in [('Новые вакансии', 'new'), ('Закрытые вакансии', 'closed'),
                        ('Повторно открытые вакансии', 'reopened'), ('Требуют проверки', 'unknown')]:
         lines += ['## ' + title, '']
         for item in result[key]:
-            link = ' — [источник](<{}>)'.format(item['url']) if item.get('url') else ''
-            lines.append('- {} — {}{} — {}'.format(md_text(item['company']), md_text(item['title']), link, item['reason']))
+            label = (item.get('company', '') + ' — ' + item.get('title', '')).replace('\n', ' ')
+            label = label.replace('[', '\\[').replace(']', '\\]')
+            lines.append('- {}{}{} — {}'.format('★ ' if item.get('priority') else '', label,
+                         ' — [ссылка](<{}>)'.format(item['url']) if item.get('url') else '', item['reason']))
         if not result[key]:
-            lines.append('- Не обнаружено в этом запуске.' if key != 'unknown' else '- Нет.')
+            lines.append('- Не обнаружено в этом запуске.')
         lines.append('')
-    lines += ['## Крупные компании (Track A/B)', '']
-    lines += ['- {} — изменений: {}; проверка: {}.'.format(md_text(i['company']), i['changes'], i['status']) for i in result['large']] or ['- В проверяемых данных отсутствуют.']
-    lines += ['', '## Статистика', '', '- Проверено компаний: ' + str(result['companies_checked']),
-              '- Пропущено компаний: ' + str(result['companies_skipped']),
-              '- Живых вакансий подтверждено в этом запуске: ' + str(result['live_jobs']),
-              '- Новых: ' + str(result['new_jobs_found']), '- Закрыто: ' + str(result['jobs_closed']),
-              '- Неопределённых результатов: ' + str(len(result['unknown'])), '', '## Источники', '']
-    lines += ['- [Источник {}](<{}>)'.format(i + 1, url) for i, url in enumerate(result['sources'])] or ['- Нет внешних источников.']
+    lines += ['## Market changes', '', '- New jobs discovered: ' + str(result['new_jobs_found']),
+              '- Closed jobs: ' + str(result['jobs_closed']),
+              '- Reopened jobs: ' + str(len(result['reopened'])), '',
+              '## Статистика', '', '- Поисковых запросов: ' + str(result['query_count']),
+              '- Проверено страниц вакансий: ' + str(result['pages_checked']),
+              '- Подтверждено LIVE: ' + str(result['live_jobs']), '- Новых: ' + str(result['new_jobs_found']),
+              '- Закрыто: ' + str(result['jobs_closed']), '- Исключено сторонних ссылок: ' + str(len(result['excluded'])),
+              '', '★ Компания из приоритетного списка. Заявки не отправлялись.', '', '## Источники', '']
+    lines += ['- [Страница](<{}>)'.format(url) for url in result['sources']]
+    lines += ['', '## Поисковые запросы', '']
+    lines += ['- ' + q['query'] for q in result['search_queries']]
     return '\n'.join(lines) + '\n'
 
 
-def save_run(output, companies, result, mode, tracker):
-    """Save snapshot and history. Run under one writer (Actions concurrency / CLI lock)."""
+def save_run(output, jobs, result, mode, tracker, companies):
     output = Path(output)
     reports = output / 'reports'
     reports.mkdir(parents=True, exist_ok=True)
@@ -359,49 +422,51 @@ def save_run(output, companies, result, mode, tracker):
     result = dict(result, mode=mode, report_file=filename)
     body = report(result, mode)
     (output / filename).write_text(body, encoding='utf-8')
-    # Dated report is the latest run; timestamped reports retain earlier checks.
     (reports / (result['date'] + '-report.md')).write_text(body, encoding='utf-8')
     write_json(reports / (run_id + '-' + mode + '.json'), result)
     tracker = copy.deepcopy(tracker)
-    tracker['check_history'].append({key: result[key] for key in
-        ('date', 'checked_at', 'mode', 'status', 'companies_checked', 'new_jobs_found', 'jobs_closed', 'report_file')})
-    write_json(output / 'data/companies-shortlist.json', companies)
+    tracker['check_history'].append({k: result[k] for k in ('date', 'checked_at', 'mode', 'status', 'pages_checked',
+                                                               'query_count', 'new_jobs_found', 'jobs_closed', 'report_file')})
+    write_json(output / 'data/jobs.json', jobs)
     write_json(output / 'data/job-tracking.json', tracker)
+    result_for_db = dict(result, companies=companies)
+    with HistoryStore(output / 'data/job-search.db') as store:
+        store.record_run(jobs, result_for_db, mode, datetime.fromisoformat(result['checked_at']))
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--mode', choices=['live', 'mock'], default='mock')
     parser.add_argument('--root', type=Path, default=ROOT)
-    parser.add_argument('--output', type=Path, help='Required separate output directory for mock mode')
+    parser.add_argument('--output', type=Path)
     parser.add_argument('--fixture', type=Path, default=ROOT / 'tests/fixtures/demo.json')
     parser.add_argument('--dry-run', action='store_true')
     args = parser.parse_args()
     root = args.root.resolve()
     if args.mode == 'mock' and (not args.output or args.output.resolve() == root):
-        parser.error('Mock requires --output pointing outside the working repository root.')
+        parser.error('Mock requires a separate --output directory.')
     output = args.output.resolve() if args.output else root
     config = read_json(root / 'data/config.json')
+    if type(config['max_pages_per_run']) is not int or not 1 <= config['max_pages_per_run'] <= 100:
+        parser.error('max_pages_per_run must be 1..100')
     fixture = read_json(args.fixture) if args.mode == 'mock' else None
     provider = MockProvider(fixture) if fixture is not None else LiveProvider(config)
+    jobs = fixture['jobs'] if fixture is not None else read_json(root / 'data/jobs.json')
     companies = fixture['companies'] if fixture is not None else read_json(root / 'data/companies-shortlist.json')
-    if not companies:
-        parser.error('Shortlist is empty; no monitoring performed.')
     output.mkdir(parents=True, exist_ok=True)
     lock = output / '.monitor.lock'
     try:
         descriptor = os.open(str(lock), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
     except FileExistsError:
-        parser.error('Another writer or stale .monitor.lock exists; verify before removing it.')
+        parser.error('Another writer or stale .monitor.lock exists.')
     try:
         os.close(descriptor)
-        now = datetime.now(timezone.utc)
-        updated, result = monitor(companies, config, provider, now)
+        updated, result = monitor(jobs, companies, config, provider, datetime.now(timezone.utc))
         print(report(result, args.mode))
         if not args.dry_run:
-            tracker_path = output / 'data/job-tracking.json'
-            tracker = read_json(tracker_path) if tracker_path.exists() else {'check_history': []}
-            save_run(output, updated, result, args.mode, tracker)
+            path = output / 'data/job-tracking.json'
+            tracker = read_json(path) if path.exists() else {'check_history': []}
+            save_run(output, updated, result, args.mode, tracker, companies)
     finally:
         lock.unlink()
 
