@@ -3,48 +3,56 @@
     {
       "company": "Demo Enterprise",
       "track": "B",
-      "priority": "High",
-      "city": "Paris",
-      "employee_count": 2000,
-      "monitoring_status": "checked",
-      "last_checked": null,
       "contact_status": "not_applied",
-      "open_roles": [
-        {
-          "title": "Field Marketing Manager",
-          "url": "https://example.com/jobs/old",
-          "status": "LIVE",
-          "found_date": "2026-09-01",
-          "applied": false
-        },
-        {
-          "title": "Partner Marketing Manager",
-          "url": "https://example.com/jobs/blocked",
-          "status": "LIVE",
-          "found_date": "2026-09-01",
-          "applied": false
-        }
-      ]
+      "monitoring_status": "checked"
+    }
+  ],
+  "jobs": [
+    {
+      "company": "Demo Enterprise",
+      "title": "Field Marketing Manager",
+      "url": "https://fr.indeed.com/viewjob?jk=old",
+      "status": "LIVE",
+      "applied": false
+    },
+    {
+      "company": "Demo Enterprise",
+      "title": "Partner Marketing Manager",
+      "url": "https://www.linkedin.com/jobs/view/blocked",
+      "status": "LIVE",
+      "applied": false
     }
   ],
   "search": {
-    "Demo Enterprise": [
+    "hits": [
       {
-        "title": "Demand Generation Manager",
-        "url": "https://example.com/jobs/new"
+        "title": "Careers",
+        "url": "https://www.welcometothejungle.com/fr/companies/demo/jobs/demand-generation_paris"
+      },
+      {
+        "title": "Field Marketing Manager",
+        "url": "https://employer.example/jobs/123"
       }
-    ]
+    ],
+    "errors": [],
+    "queries": [
+      {
+        "platform": "mock",
+        "query": "MOCK: jobs in France"
+      }
+    ],
+    "query_count": 18
   },
   "pages": {
-    "https://example.com/jobs/old": {
+    "https://fr.indeed.com/viewjob?jk=old": {
       "status": 404
     },
-    "https://example.com/jobs/blocked": {
+    "https://www.linkedin.com/jobs/view/blocked": {
       "status": 403
     },
-    "https://example.com/jobs/new": {
+    "https://www.welcometothejungle.com/fr/companies/demo/jobs/demand-generation_paris": {
       "status": 200,
-      "body": "<script type=\"application/ld+json\">{\"@context\": \"https://schema.org\", \"@type\": \"JobPosting\", \"title\": \"Demand Generation Manager\", \"hiringOrganization\": {\"name\": \"Demo Enterprise\"}, \"jobLocation\": {\"address\": {\"addressCountry\": \"FR\", \"addressLocality\": \"Paris\"}}, \"validThrough\": \"2099-12-31\"}</script>"
+      "body": "<script type=\"application/ld+json\">{\"@context\": \"https://schema.org\", \"@type\": \"JobPosting\", \"title\": \"Demand Generation Manager\", \"hiringOrganization\": {\"name\": \"Demo Enterprise\"}, \"jobLocation\": {\"address\": {\"addressCountry\": \"FR\"}}, \"validThrough\": \"2099-12-31\"}</script>"
     }
   }
 }
