@@ -1,0 +1,62 @@
+name: Monitor jobs
+on:
+  schedule:
+    # Requested calendar cadence: odd days of month, 10:00 UTC, not exactly 48h.
+    - cron: '0 10 */2 * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: job-monitor
+  cancel-in-progress: false
+jobs:
+  monitor:
+    # Enable only after importing shortlist and configuring Brave API key.
+    if: vars.MONITOR_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test
+        run: python -m unittest discover -s tests -v
+      - name: Live monitoring
+        env:
+          BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+        run: python scripts/check-jobs.py --mode live
+      - name: Validate tracker
+        run: python scripts/update-tracker.py
+      - name: Commit data and reports
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/companies-shortlist.json data/job-tracking.json reports/
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update job monitoring data and reports'
+            git push origin "HEAD:$DEFAULT_BRANCH"
+          fi
+      - name: Preserve results if push fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: monitoring-recovery
+          path: |
+            data/companies-shortlist.json
+            data/job-tracking.json
+            reports/
+      - name: Flag partial coverage after saving results
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          history = json.loads(Path('data/job-tracking.json').read_text())['check_history']
+          if history[-1]['status'] != 'completed':
+              raise SystemExit('Partial monitoring: inspect the saved report for unknown results.')
+          PY
