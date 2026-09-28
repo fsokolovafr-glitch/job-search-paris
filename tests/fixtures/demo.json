@@ -1,0 +1,50 @@
+{
+  "companies": [
+    {
+      "company": "Demo Enterprise",
+      "track": "B",
+      "priority": "High",
+      "city": "Paris",
+      "employee_count": 2000,
+      "monitoring_status": "checked",
+      "last_checked": null,
+      "contact_status": "not_applied",
+      "open_roles": [
+        {
+          "title": "Field Marketing Manager",
+          "url": "https://example.com/jobs/old",
+          "status": "LIVE",
+          "found_date": "2026-09-01",
+          "applied": false
+        },
+        {
+          "title": "Partner Marketing Manager",
+          "url": "https://example.com/jobs/blocked",
+          "status": "LIVE",
+          "found_date": "2026-09-01",
+          "applied": false
+        }
+      ]
+    }
+  ],
+  "search": {
+    "Demo Enterprise": [
+      {
+        "title": "Demand Generation Manager",
+        "url": "https://example.com/jobs/new"
+      }
+    ]
+  },
+  "pages": {
+    "https://example.com/jobs/old": {
+      "status": 404
+    },
+    "https://example.com/jobs/blocked": {
+      "status": 403
+    },
+    "https://example.com/jobs/new": {
+      "status": 200,
+      "body": "<script type=\"application/ld+json\">{\"@context\": \"https://schema.org\", \"@type\": \"JobPosting\", \"title\": \"Demand Generation Manager\", \"hiringOrganization\": {\"name\": \"Demo Enterprise\"}, \"jobLocation\": {\"address\": {\"addressCountry\": \"FR\", \"addressLocality\": \"Paris\"}}, \"validThrough\": \"2099-12-31\"}</script>"
+    }
+  }
+}
