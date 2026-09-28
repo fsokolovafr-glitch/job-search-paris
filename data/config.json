@@ -29,5 +29,11 @@
     "marketing terrain",
     "marketing partenaires"
   ],
-  "search_pages": 1
+  "max_pages_per_run": 60,
+  "search_scope": "all_matching_jobs_priority_companies_highlighted",
+  "platforms": [
+    "linkedin",
+    "indeed",
+    "welcome_to_the_jungle"
+  ]
 }
