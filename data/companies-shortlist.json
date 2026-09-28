@@ -1,0 +1,23 @@
+[
+  {
+    "company": "LumApps",
+    "track": "C",
+    "priority": "High",
+    "city": "Paris",
+    "employee_count": null,
+    "monitoring_status": "found_not_applied",
+    "open_roles": [
+      {
+        "title": "Country Marketing Manager (Field & Demand Gen)",
+        "url": "https://job.lumapps.com/jobs/7685015-country-marketing-manager-field-demand-gen-manager-france",
+        "status": "UNKNOWN",
+        "source_reported_status": "LIVE",
+        "found_date": "2026-09-08",
+        "applied": false,
+        "provenance": "User supplied example; not independently verified"
+      }
+    ],
+    "last_checked": null,
+    "contact_status": "not_applied"
+  }
+]

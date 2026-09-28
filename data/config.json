@@ -1,0 +1,33 @@
+{
+  "country": "France",
+  "country_code": "FR",
+  "country_aliases": [
+    "FR",
+    "France"
+  ],
+  "role_keywords": [
+    "demand gen",
+    "field marketing",
+    "partner marketing",
+    "country marketing",
+    "marketing terrain",
+    "marketing partenaires",
+    "generation de demande"
+  ],
+  "excluded_keywords": [
+    "intern",
+    "internship",
+    "stagiaire",
+    "stage",
+    "alternance"
+  ],
+  "search_terms": [
+    "demand generation",
+    "field marketing",
+    "partner marketing",
+    "country marketing",
+    "marketing terrain",
+    "marketing partenaires"
+  ],
+  "search_pages": 1
+}

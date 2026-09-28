@@ -1,0 +1,27 @@
+{
+  "source": "User task dated 2026-09-28",
+  "data_complete": false,
+  "supplied_companies": 1,
+  "expected_shortlist": 44,
+  "reported_total": 120,
+  "reported_tracks": {
+    "A": 89,
+    "B": 6,
+    "C": 26
+  },
+  "computed_track_total": 121,
+  "reported_excluded_track_a_backlog": 75,
+  "unknowns": [
+    "Full company list",
+    "Original Schedule Task rules",
+    "Actual application and rejection statuses"
+  ],
+  "conflicts": [
+    "Track counts total 121, whereas stated total is 120"
+  ],
+  "note": "Backlog empty means not imported, not zero real backlog companies.",
+  "github": {
+    "repository": "fsokolovafr-glitch/job-search-paris",
+    "visibility": "private"
+  }
+}
