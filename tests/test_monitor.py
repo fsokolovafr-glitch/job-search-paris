@@ -194,7 +194,7 @@ class Tests(unittest.TestCase):
             history=m.read_json(root/'data/job-tracking.json')['check_history']
             self.assertIn('MOCK',(root/history[0]['report_file']).read_text())
             m.validate(m.read_json(root/'data/jobs.json'))
-            self.assertFalse((root/'data/companies-shortlist.json').exists())
+            self.assertTrue((root/'data/companies-shortlist.json').exists())
 
     def test_missing_key_and_invalid_job(self):
         with patch.dict('os.environ',{},clear=True):
