@@ -1,34 +1,14 @@
-# Приёмка — 2026-09-28
+# Проверка результата
 
-Цель: воспроизводимый мониторинг целевых вакансий и автоматическое сохранение
-истории/отчётов. Принимает и эксплуатирует Krolik.
+- Unit tests: `python3 -m unittest discover -s tests -v`.
+- Покрытие SQLite: `python3 -m coverage run --source=scripts -m unittest discover -s tests`;
+  `python3 -m coverage report --include='*/history_store.py' --fail-under=90`.
+- Mock: `python3 scripts/check-jobs.py --mode mock --output work/demo` дважды.
+- Валидация: `python3 scripts/update-tracker.py --root work/demo`.
+- Аналитика: `python3 scripts/job-analytics.py --db work/demo/data/job-search.db --trend 30d`.
 
-| Критерий | Проверка | Результат |
-|---|---|---|
-| Структура, JSON, пример и документы | Чтение всех JSON, проверка файлов | Успешно |
-| Новые/закрытые/UNKNOWN, география, работодатель | 18 unittest, Python 3.9.6 | Успешно |
-| Повторное состояние без дублей событий | test_repeat_no_duplicate_events | Успешно |
-| Mock end-to-end | check-jobs.py --mode mock, затем update-tracker.py | Успешно: 1 новое, 1 закрыто, 1 UNKNOWN |
-| Рабочие JSON не меняются от mock | SHA-256 до/после CLI-проверок | Успешно |
-| Missing-key, обязательный mock output, dry-run | CLI-коды завершения и проверка файлов | Успешно |
-| Согласованность истории | update-tracker.py, рабочая и mock-папки | Успешно |
-| Live WebSearch и реальные страницы | Требуется ключ Brave | Не проверено |
-| Полные 44 shortlist и backlog | Требуются исходные списки | Не выполнено |
-| Точные правила Schedule Task | Требуется исходный текст | Не сверено |
-| GitHub создание | fsokolovafr-glitch/job-search-paris, Private; проверено в UI | Успешно |
-| Actions commit/push | Требуются ключ поиска и shortlist | Не проверено |
-| Python 3.11 / 3.13 | Матрица CI предусмотрена | Локально не проверено |
+Проверки включают Unicode, tracking URL, close/reopen, пропущенные проверки,
+UNKNOWN, отсутствие ложных обновлений, rollback, однократный импорт и статусы заявок.
+CI выполняет проверки на Python 3.9, 3.11, 3.13. Текущий результат смотрите в Actions.
 
-Проверено Codex локально. GitHub Actions YAML подготовлен; исполнение на GitHub
-не проверялось. Успех mock подтверждает обработку сценариев, не покрытие реальных ATS.
-
-Технические ограничения: JobPosting-разметка может быть устаревшей; WebSearch
-ограничен индексом и глубиной; неизвестные результаты требуют ручной проверки.
-Файлы JSON заменяются атомарно по одному, но весь комплект не является единой
-файловой транзакцией: при аварии между записями сверить JSON отчёта и историю,
-при необходимости восстановить последний Git commit и повторить проверку.
-Не использовать параллельных локальных писателей в один output.
-
-Следующий шаг: завершить публикацию файлов, импортировать
-списки и правила, настроить secret, выполнить live dry-run, затем включить
-MONITOR_ENABLED=true и проверить ручной запуск Actions.
+Успешные тесты не подтверждают live-доступность площадок и полноту поиска.
