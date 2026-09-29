@@ -1,6 +1,7 @@
 name: Monitor jobs
 on:
   schedule:
+    # Requested calendar cadence: odd days of month, 10:00 UTC, not exactly 48h.
     - cron: '0 10 */2 * *'
   workflow_dispatch:
 permissions:
@@ -10,6 +11,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   monitor:
+    # Enable only after configuring Brave API key and reviewing the live pilot.
     if: vars.MONITOR_ENABLED == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 90
@@ -35,9 +37,9 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/jobs.json data/job-search.db data/job-tracking.json reports/
+          git add data/companies-shortlist.json data/jobs.json data/job-search.db data/job-tracking.json reports/
           if ! git diff --cached --quiet; then
-            git commit -m 'Update job monitoring data and SQLite history'
+            git commit -m 'Update job monitoring data and reports'
             git push origin "HEAD:$DEFAULT_BRANCH"
           fi
       - name: Preserve results if push fails
