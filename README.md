@@ -34,6 +34,8 @@ scripts/
   job-analytics.py           # аналитика
   update-tracker.py          # проверка SQLite и восстановление экспортов
   parse-jobs.py              # разбор сохранённого HTML
+docs/resume-format.md        # единый формат резюме (макет, палитра, правила ATS)
+docs/resume/Main.dc.html     # исходник макета резюме (Design Component)
 reports/                     # Markdown и JSON каждого запуска
 dashboard/index.html         # независимый ручной снимок
 .github/workflows/           # мониторинг и CI
