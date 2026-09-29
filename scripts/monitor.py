@@ -6,8 +6,10 @@ import json
 import os
 import re
 import time
+import tempfile
+import shutil
 import unicodedata
-from history_store import HistoryStore
+from history_store import HistoryStore, canonical
 from datetime import date, datetime, timedelta, timezone
 from html.parser import HTMLParser
 from itertools import zip_longest
@@ -60,15 +62,6 @@ def platform_for(url):
         pass
     return None
 
-
-def canonical(url):
-    """Deduplication key only; never use this key as a replacement request URL."""
-    p = urlsplit(url)
-    if p.scheme not in ('https', 'http') or not p.hostname or p.username or p.password:
-        raise ValueError('Invalid HTTP URL')
-    query = [(k, v) for k, v in parse_qsl(p.query, keep_blank_values=True)
-             if not k.lower().startswith('utm_') and k.lower() not in ('gclid', 'fbclid')]
-    return urlunsplit((p.scheme.lower(), p.netloc.lower(), p.path, urlencode(sorted(query)), ''))
 
 
 def has_phrase(text, phrase):
@@ -157,8 +150,7 @@ def classify(page, config, now, expected=None):
         return 'UNKNOWN', page.get('error', 'HTTP ' + str(status)), None
     candidates = [j for j in job_postings(page.get('body', '')) if eligible(j, config)]
     if expected:
-        candidates = [j for j in candidates if normalize(j.get('title')) == normalize(expected['title'])
-                      and normalize(j['hiringOrganization']['name']) == normalize(expected['company'])]
+        candidates = [j for j in candidates if normalize(j['hiringOrganization']['name']) == normalize(expected['company'])]
     if len(candidates) != 1:
         return 'UNKNOWN', 'missing_or_ambiguous_matching_JobPosting', None
     job = candidates[0]
@@ -374,6 +366,8 @@ def monitor(jobs, companies, config, provider, now):
         if status == 'CLOSED' and previous != 'CLOSED':
             result['closed'].append(event)
         if status == 'LIVE':
+            job['title'] = posting['title']
+            job['posting'] = posting
             result['live_jobs'] += 1
             if previous == 'CLOSED':
                 result['reopened'].append(event)
@@ -420,18 +414,17 @@ def save_run(output, jobs, result, mode, tracker, companies):
     run_id = result['checked_at'].replace(':', '').replace('+', '_')
     filename = 'reports/{}-{}.md'.format(run_id, mode)
     result = dict(result, mode=mode, report_file=filename)
-    body = report(result, mode)
+    with HistoryStore(output / 'data/job-search.db') as store:
+        if not store.initialized():
+            store.bootstrap([], companies, tracker)
+        store.record_run(jobs, dict(result, companies=companies), mode, datetime.fromisoformat(result['checked_at']))
+        write_json(output / 'data/jobs.json', store.export_jobs())
+        write_json(output / 'data/companies-shortlist.json', store.export_companies())
+        write_json(output / 'data/job-tracking.json', store.export_tracker())
+        body = report(result, mode) + '\n## Hiring Intelligence\n\n' + store.intelligence_text(30, datetime.fromisoformat(result['checked_at']))
     (output / filename).write_text(body, encoding='utf-8')
     (reports / (result['date'] + '-report.md')).write_text(body, encoding='utf-8')
     write_json(reports / (run_id + '-' + mode + '.json'), result)
-    tracker = copy.deepcopy(tracker)
-    tracker['check_history'].append({k: result[k] for k in ('date', 'checked_at', 'mode', 'status', 'pages_checked',
-                                                               'query_count', 'new_jobs_found', 'jobs_closed', 'report_file')})
-    write_json(output / 'data/jobs.json', jobs)
-    write_json(output / 'data/job-tracking.json', tracker)
-    result_for_db = dict(result, companies=companies)
-    with HistoryStore(output / 'data/job-search.db') as store:
-        store.record_run(jobs, result_for_db, mode, datetime.fromisoformat(result['checked_at']))
 
 
 def main():
@@ -451,8 +444,17 @@ def main():
         parser.error('max_pages_per_run must be 1..100')
     fixture = read_json(args.fixture) if args.mode == 'mock' else None
     provider = MockProvider(fixture) if fixture is not None else LiveProvider(config)
-    jobs = fixture['jobs'] if fixture is not None else read_json(root / 'data/jobs.json')
-    companies = fixture['companies'] if fixture is not None else read_json(root / 'data/companies-shortlist.json')
+    sandbox = None
+    if args.dry_run:
+        sandbox = tempfile.TemporaryDirectory()
+        previous_output = output
+        output = Path(sandbox.name)
+        (output / 'data').mkdir()
+        if (previous_output / 'data/job-search.db').exists():
+            import sqlite3
+            with sqlite3.connect(previous_output / 'data/job-search.db') as source_db:
+                with sqlite3.connect(output / 'data/job-search.db') as target_db:
+                    source_db.backup(target_db)
     output.mkdir(parents=True, exist_ok=True)
     lock = output / '.monitor.lock'
     try:
@@ -461,14 +463,22 @@ def main():
         parser.error('Another writer or stale .monitor.lock exists.')
     try:
         os.close(descriptor)
+        with HistoryStore(output / 'data/job-search.db') as store:
+            if not store.initialized():
+                if fixture is not None:
+                    store.bootstrap(fixture['jobs'], fixture['companies'], {'check_history': []})
+                else:
+                    store.bootstrap(read_json(root / 'data/jobs.json'), read_json(root / 'data/companies-shortlist.json'),
+                                    read_json(root / 'data/job-tracking.json'))
+            jobs, companies, tracker = store.export_jobs(), store.export_companies(), store.export_tracker()
         updated, result = monitor(jobs, companies, config, provider, datetime.now(timezone.utc))
         print(report(result, args.mode))
         if not args.dry_run:
-            path = output / 'data/job-tracking.json'
-            tracker = read_json(path) if path.exists() else {'check_history': []}
             save_run(output, updated, result, args.mode, tracker, companies)
     finally:
         lock.unlink()
+        if sandbox:
+            sandbox.cleanup()
 
 
 if __name__ == '__main__':
