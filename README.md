@@ -1,3 +1,5 @@
+[Job Search Pipeline](dashboard/index.html) — HTML-артефакт: скачайте и откройте в браузере. Автосинхронизация с SQLite не настроена.
+
 # job-search-paris
 
 Мониторинг маркетинговых вакансий во Франции для Krolik: demand generation,
