@@ -1,0 +1,428 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Job Search Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+/* Layout: редакционный отчёт. Сводка сверху, очередь действий (найдено, не подано) до общей таблицы. Цвет только у действий. */
+:root{
+  --bg:#F6F5F1; --surface:#FFFFFF; --line:#E1DED6; --line-strong:#C9C5BA;
+  --ink:#1C1B18; --ink-2:#4A4842; --muted:#7D7A73; --faint:#ABA79D;
+  --apply:#2C6A4B; --apply-bg:#E4F0E9;
+  --wait:#2D5D8C; --wait-bg:#E3ECF5;
+  --spont:#8A5710; --spont-bg:#F5EAD3;
+  --watch:#5E5B54; --watch-bg:#EAE8E1;
+  --skip:#8F8B82; --skip-bg:#F0EEE8;
+  --reserve:#A29E94; --reserve-bg:transparent;
+  --tA:#1C1B18; --tB:#75716A; --tC:#B4B0A5;
+  --serif:'IBM Plex Serif',Georgia,serif; --sans:'IBM Plex Sans',-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14161A; --surface:#1B1E23; --line:#2A2E35; --line-strong:#3A3F48;
+    --ink:#ECEAE4; --ink-2:#BDBAB2; --muted:#8C8981; --faint:#5F5D57;
+    --apply:#79C7A0; --apply-bg:#1D3128;
+    --wait:#86B2E0; --wait-bg:#1C2B3B;
+    --spont:#E0AC62; --spont-bg:#372A14;
+    --watch:#B0ADA5; --watch-bg:#26292F;
+    --skip:#78766F; --skip-bg:#1F2227;
+    --reserve:#68665F;
+    --tA:#ECEAE4; --tB:#8C8981; --tC:#4A4D54;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14161A; --surface:#1B1E23; --line:#2A2E35; --line-strong:#3A3F48;
+  --ink:#ECEAE4; --ink-2:#BDBAB2; --muted:#8C8981; --faint:#5F5D57;
+  --apply:#79C7A0; --apply-bg:#1D3128;
+  --wait:#86B2E0; --wait-bg:#1C2B3B;
+  --spont:#E0AC62; --spont-bg:#372A14;
+  --watch:#B0ADA5; --watch-bg:#26292F;
+  --skip:#78766F; --skip-bg:#1F2227;
+  --reserve:#68665F;
+  --tA:#ECEAE4; --tB:#8C8981; --tC:#4A4D54;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;padding-inline:20px;padding-block:44px 80px}
+.wrap{max-width:1140px;margin-inline:auto}
+h1,h2{font-family:var(--serif);font-weight:500;margin:0;text-wrap:balance}
+a{color:var(--ink);text-decoration-color:var(--line-strong);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--ink)}
+:focus-visible{outline:2px solid var(--wait);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+.hero{padding-bottom:28px;border-bottom:1px solid var(--line);margin-bottom:32px}
+.kicker{color:var(--muted);font-size:12.5px;letter-spacing:.02em;margin-bottom:12px}
+.hero h1{font-size:clamp(26px,4.4vw,36px);font-style:italic;line-height:1.22;max-width:720px}
+.hero p{color:var(--ink-2);max-width:640px;margin:14px 0 0;font-size:14.5px}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-block:1px solid var(--line-strong);margin-bottom:36px}
+.stat{padding:18px 20px;border-right:1px solid var(--line);min-width:0}
+.stat:last-child{border-right:0}
+.stat b{display:block;font-family:var(--serif);font-size:30px;font-weight:600;line-height:1.1}
+.stat span{display:block;color:var(--muted);font-size:12.5px;margin-top:6px}
+
+section{margin-bottom:48px}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px 16px;margin-bottom:16px}
+.sec-head h2{font-size:18px;font-weight:600}
+.sec-head .sub{color:var(--muted);font-size:12.5px}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.chip{font:inherit;font-size:12.5px;cursor:pointer;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);padding:6px 12px;display:inline-flex;gap:8px;align-items:center}
+.chip .n{font-variant-numeric:tabular-nums;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip[aria-pressed="true"] .n{color:var(--bg);opacity:.75}
+
+/* badges */
+.badge{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 9px;white-space:nowrap;letter-spacing:.01em}
+.b-apply{background:var(--apply-bg);color:var(--apply)}
+.b-wait{background:var(--wait-bg);color:var(--wait)}
+.b-spont{background:var(--spont-bg);color:var(--spont)}
+.b-watch{background:var(--watch-bg);color:var(--watch)}
+.b-skip{background:var(--skip-bg);color:var(--skip)}
+.b-reserve{border:1px solid var(--line);color:var(--reserve)}
+.cv{display:inline-block;font-size:11px;color:var(--ink-2);border:1px solid var(--line-strong);padding:1px 7px;margin-left:6px;white-space:nowrap}
+.cv.field{border-color:var(--apply);color:var(--apply)}
+.pill{display:inline-block;font-size:11px;font-weight:500;padding:1px 8px;border:1px solid var(--line-strong);color:var(--ink-2);white-space:nowrap}
+.pill.A{border-color:var(--tA);color:var(--ink)}
+.pill.B{border-color:var(--tB)}
+.pill.C{border-color:var(--tC)}
+.st{font-size:12.5px;color:var(--muted)}
+.st-found{color:var(--ink);font-weight:500}
+.st-inprocess{color:var(--wait);font-weight:500}
+.st-rejected{color:var(--skip)}
+
+/* tracks */
+.track{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.track .tn{width:210px;flex-shrink:0}
+.track .tn b{display:block;font-weight:600}
+.track .tn small{color:var(--muted);font-size:12px}
+.bar{flex:1;min-width:0;height:20px;background:var(--surface);border:1px solid var(--line);display:flex;overflow:hidden}
+.bar i{display:block;height:100%}
+.bar i.bk{opacity:.3}
+.track .tc{width:72px;text-align:right;color:var(--ink-2);flex-shrink:0}
+.legend{color:var(--muted);font-size:12px;display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend i{width:9px;height:9px;display:inline-block}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:36px}
+.cols>div{min-width:0}
+.mrow{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:13px}
+.mrow .l{width:150px;flex-shrink:0;color:var(--ink-2)}
+.mrow .t{flex:1;min-width:0;height:7px;background:var(--surface);border:1px solid var(--line)}
+.mrow .t i{display:block;height:100%;background:var(--ink)}
+.mrow .n{width:30px;text-align:right;color:var(--muted)}
+
+/* tables */
+.tw{overflow-x:auto;border-top:1px solid var(--line-strong)}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:760px}
+th{text-align:left;font-weight:500;font-size:11.5px;letter-spacing:.03em;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line-strong);white-space:nowrap}
+td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:hover{background:var(--surface)}
+td .co{font-weight:600}
+td .sm{color:var(--muted);font-size:12px;margin-top:2px}
+.nx{min-width:230px}
+.nx .tx{display:block;margin-top:5px;color:var(--ink-2);font-size:12.5px}
+.closed{color:var(--skip);text-decoration:line-through;text-decoration-color:var(--line-strong)}
+
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.filters input,.filters select{font:inherit;font-size:13px;background:var(--surface);color:var(--ink);border:1px solid var(--line-strong);padding:8px 11px}
+.filters input{flex:1;min-width:180px}
+.count{color:var(--muted);font-size:12px;margin-top:10px}
+
+.note{color:var(--ink-2);max-width:700px;margin:0 0 14px}
+.callout{background:var(--surface);border:1px solid var(--line);padding:14px 16px;color:var(--ink-2);max-width:760px;margin-top:14px}
+.callout b{color:var(--ink)}
+.cvbox{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+.cvbox div{background:var(--surface);border:1px solid var(--line);padding:14px 16px;min-width:0}
+.cvbox b{display:block;margin-bottom:4px}
+.cvbox p{margin:0;color:var(--ink-2);font-size:13px}
+footer{color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:18px;margin-top:56px;max-width:820px}
+
+@media (max-width:760px){
+  body{padding-block:28px 60px}
+  .stats{grid-template-columns:1fr 1fr}
+  .stat:nth-child(2){border-right:0}
+  .stat:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .cols,.cvbox{grid-template-columns:1fr}
+  .track{flex-wrap:wrap;gap:6px 12px}
+  .track .tn{width:100%}
+  .track .tc{width:auto}
+  .mrow .l{width:120px}
+}
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="kicker">Job Search · Франция · статусы на 08.09.2026, вакансии и новые AI-компании проверены 29.09.2026</div>
+  <h1 id="heroTitle"></h1>
+  <p id="heroText"></p>
+</header>
+
+<div class="stats" id="stats"></div>
+
+<section>
+  <div class="sec-head"><h2>Что делать дальше</h2><div class="sub">по каждой компании: подать, ждать, спонтанная заявка</div></div>
+  <div class="cvbox">
+    <div><b>CV Field Marketing</b><p>Файл CV_Faina_Sokolova_Veeam_FieldMarketing.docx, «Senior Field Marketing Manager — B2B Enterprise &amp; Partner Ecosystem (EMEA)». Для field, partner и demand gen ролей.</p></div>
+    <div><b>Базовое CV</b><p>Для growth, customer marketing и digital ролей. Перед отправкой подстроить заголовок и профиль под вакансию.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Фокус поиска</h2><div class="sub">решение от 29.09.2026</div></div>
+  <div class="cvbox">
+    <div><b id="focusC"></b><p>Основной поиск. AI и tech scale-ups, где маркетинг встроен в продукт. Здесь все живые вакансии, найденные аудитом.</p></div>
+    <div><b id="focusAB"></b><p>Фоновый мониторинг раз в 2 дня. Аудит Track A показал: живых маркетинг-вакансий нет, у мелких интеграторов нет отдельного маркетинга. Точечные спонтанные заявки только в крупные компании.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Найдено — ещё не подано</h2><div class="sub" id="foundSub"></div></div>
+  <div class="tw"><table>
+    <thead><tr><th>Компания</th><th>Вакансия</th><th>Статус вакансии</th><th>Следующий шаг</th><th>Ссылка</th></tr></thead>
+    <tbody id="foundBody"></tbody>
+  </table></div>
+  <div class="callout" id="foundNote"></div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Треки — Франция</h2><div class="sub">шорт-лист (насыщенный) и резерв (приглушённый)</div></div>
+  <div id="tracks"></div>
+  <div class="legend">
+    <span><i style="background:var(--tA)"></i>Track A</span>
+    <span><i style="background:var(--tB)"></i>Track B</span>
+    <span><i style="background:var(--tC)"></i>Track C</span>
+  </div>
+</section>
+
+<section class="cols">
+  <div><div class="sec-head"><h2>Приоритет (шорт-лист, Франция)</h2></div><div id="prioBars"></div></div>
+  <div><div class="sec-head"><h2>Реальный статус (по почте)</h2></div><div id="statusBars"></div></div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Track A — аудит открытых вакансий</h2><div class="sub">вручную, 08.09.2026: 14 компаний шорт-листа и Koesio из резерва</div></div>
+  <p class="note">Проверяли реальные открытые вакансии в маркетинге и demand gen, а не то, что записано в Role keywords. Koesio: 4500 сотрудников, оборот 1,15 млрд €.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Компания</th><th>Размер</th><th>Открытая маркетинг-вакансия?</th><th>Следующий шаг</th></tr></thead>
+    <tbody>
+      <tr><td class="co">sa.global</td><td>1000+, 25 стран</td><td class="st">Demand gen есть глобально, но не во Франции</td><td class="nx"><span class="badge b-watch">Мониторить</span><span class="tx">LinkedIn-алерт, во Франции не подавать</span></td></tr>
+      <tr><td class="co">Prodware</td><td>1200+</td><td class="st">Нет сейчас, но исторически нанимает в маркетинг</td><td class="nx"><span class="badge b-spont">Спонтанная</span><span class="cv field">CV Field Marketing</span><span class="tx">Кандидат на спонтанную заявку</span></td></tr>
+      <tr><td class="co">Exakis Nelite / Magellan</td><td>1250+</td><td class="st">Нет. Спонтанная заявка отправлена 08.09.26</td><td class="nx"><span class="badge b-wait">Ждать ответа</span><span class="tx">Прошло 3 недели, короткий follow-up</span></td></tr>
+      <tr><td class="co">Koesio (резерв)</td><td>4500, 1,15 млрд €</td><td class="st">Нет (проверено 40 из 67 открытых позиций)</td><td class="nx"><span class="badge b-spont">Спонтанная</span><span class="cv field">CV Field Marketing</span><span class="tx">Одна заявка на группу</span></td></tr>
+      <tr><td class="co">Остальные 10 компаний шорт-листа</td><td>20–300 чел.</td><td class="st">Нет, маркетинг-функции часто нет вообще</td><td class="nx"><span class="badge b-watch">Мониторить</span><span class="tx">Автомониторинг раз в 2 дня</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout"><b>Вывод.</b> Живых маркетинг-вакансий в Track A сейчас нет нигде. Небольшие интеграторы не держат отдельного маркетинга, у крупных найм эпизодический. Ручной обход резерва не рекомендуется. Вместо него: LinkedIn-алерт на «demand generation» и «field marketing» + «Microsoft Dynamics» France и точечные спонтанные заявки в крупные компании.</div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Все компании</h2><div class="sub" id="allSub"></div></div>
+  <div class="chips" id="chips"></div>
+  <div class="filters">
+    <input id="q" type="search" placeholder="Поиск по компании, роли или статусу">
+    <select id="scope"></select>
+    <select id="track"><option value="">Все треки</option><option value="A">Track A</option><option value="B">Track B</option><option value="C">Track C</option></select>
+    <select id="prio"></select>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>Компания</th><th>Трек</th><th>Приоритет</th><th>Роли</th><th>Реальный статус</th><th>Следующий шаг</th></tr></thead>
+    <tbody id="body"></tbody>
+  </table></div>
+  <div class="count" id="count"></div>
+</section>
+
+<footer>Источники: страницы вакансий Mistral (Lever), Algolia (Greenhouse), Doctolib, Owkin, Ledger (проверено 29.09.2026), Job_Search_Companies_2026.xlsx (Quick Shortlist и Full Partner Backlog, Франция), обе версии дашборда от 08.09.2026 со сверкой статусов по Gmail, ручной аудит Track A/B/C, итоги мониторинга вакансий до 28.09.2026. Следующие шаги — рекомендации на 29.09.2026. Заявленная в голосовом разговоре вакансия Doctolib Growth Marketing Manager B2B оказалась закрытым объявлением 2019 года и в дашборд не включена, не подтверждённые данные помечены. Страница статичная и обновляется только при пересборке.</footer>
+</div>
+
+<script>
+var NEXT={apply:'Подать резюме',wait:'Ждать ответа',spont:'Спонтанная',watch:'Мониторить',skip:'Пропустить',reserve:'Резерв'};
+var STAGE={inprocess:'В процессе',found:'Найдено, не подано',rejected:'Отказ',silent:'Без ответа',checked:'Проверено, вакансии нет',backlog:'Не проверялась',new:'Новая, не проверена'};
+var CVN={field:'CV Field Marketing',base:'Базовое CV'};
+
+/* [компания, трек, локация, приоритет, роли, этап, статус, шаг, текст шага, cv] */
+var SL=[
+['CoxiDev','A','France','A','Marketing Manager, B2B Campaigns, Partner Marketing','checked','Проверено 08.09: маркетинг-вакансии нет','watch','Автомониторинг раз в 2 дня',''],
+['Talent Business Solutions','A','France','A+','Field Marketing, Partner Marketing, Demand Gen, Campaign Manager','checked','Вакансии нет: кадровая структура, не клиентский маркетинг','skip','Нет клиентского маркетинга',''],
+['Symelia','A','France','A+','Marketing Manager, Partner Marketing, Growth Marketing','checked','Маркетинг-роли нет, только технические консультанты','watch','Автомониторинг раз в 2 дня',''],
+['Calliope Business Solution','A','France','A+','Field Marketing, Campaign Manager, Partner Marketing','checked','Данных нет, вероятно слишком мала для маркетинга','watch','Автомониторинг раз в 2 дня',''],
+['Prodware','A','France','A+','Marketing Manager, Demand Gen, Field Marketing','checked','Вакансии нет, но 1200+ сотрудников и история найма в lead gen','spont','Спонтанная заявка на field и demand gen','field'],
+['Apsia / Sharp DX','A','France','A','Marketing Manager, Campaign Manager, Product Marketing','checked','13 вакансий, все технические и PMO','watch','Автомониторинг раз в 2 дня',''],
+['VNEXT','A','France','A','Field Marketing, Partner Marketing, Demand Gen','checked','Данных нет, вероятно слишком мала','watch','Автомониторинг раз в 2 дня',''],
+['Sword Group / Coexya','A','France','A','Marketing Manager, Campaign Manager, Field Marketing','checked','Маркетинг-роли нет, куплена Talan в дек. 2024','skip','Самостоятельного маркетинга нет',''],
+['sa.global','A','France','A+','Partner Marketing, Demand Gen, Field Marketing','checked','Demand gen есть глобально, во Франции вакансий нет (роли в Индии и Азии)','watch','LinkedIn-алерт, во Франции не подавать',''],
+['Devoteam Customer Effectiveness','A','France','A','CRM Marketing, Field Marketing, Demand Gen','checked','Во Франции вакансий нет (стажировки в Бельгии и Португалии)','spont','Крупный игрок: спонтанная по совету аудита. Рекомендация, не проверено','field'],
+['Exakis Nelite / Magellan','A','France','A+','Field Marketing, Partner Marketing, Event Marketing','inprocess','Спонтанная заявка отправлена 08.09.26','wait','Ответа нет 3 недели: короткий follow-up','field'],
+['Smart Global Governance','A','France','A','Demand Gen, Product Marketing, Growth Marketing','checked','Маркетинга нет, 52 сотрудника','skip','Слишком мала',''],
+['Neos-SDI','A','France','A','Field Marketing, Partner Marketing, Campaign Manager','checked','Поглощена Groupe Open (2020), своего маркетинга нет','skip','Самостоятельного маркетинга нет',''],
+['Isatech','A','France','A+','Marketing Manager, Demand Gen, Partner Marketing','checked','Маркетинг-вакансии не найдено','watch','Автомониторинг раз в 2 дня',''],
+['NeverHack','B','France','A+','Demand Gen, Field Marketing, B2B Marketing, Partner Marketing','checked','0 открытых позиций вообще (Glassdoor)','watch','Вернуться, когда откроют позиции',''],
+['MARLINK','B','France','A','Regional Marketing, Campaign Manager, Field Marketing','checked','Сейчас нет, внутри есть Marcom-команда','watch','Автомониторинг раз в 2 дня',''],
+['SONEPAR France','B','France','A','Digital Marketing, CRM Marketing, Marketing Ops','checked','Digital Marketing Operations Lead (июнь 2026, почти идеальный fit) закрыта','watch','Ждать повторного открытия',''],
+['Raja / RETIF','B','France','A','CRM Marketing, Campaign Manager, Customer Marketing','checked','Роль «Chargé marketing opérationnel» повторяется, актуальность не подтверждена (сайт на JS)','watch','Проверить сайт вручную',''],
+['APAVE','B','France','A','Marketing Manager, Digital Marketing, Sector Marketing','checked','796 вакансий, все технические, маркетинга нет','skip','Маркетинга нет',''],
+['Veeam Software','B','France / Paris','—','Regional Field Marketing Manager, Southern Europe (найдена через LinkedIn)','inprocess','Подано 08.09.26','wait','Ждать. Через 3 недели написать рекрутёру в LinkedIn','field'],
+['Mistral AI','C','France / Paris','High','Demand Generation Lead, Product Marketing, Growth Marketing','found','Открыта: Senior, Technical Product Marketing (Paris / London), проверено 29.09. Demand Generation Lead и Senior PMM B2B закрыты','apply','Подать на Technical Product Marketing, сверить технические требования','base'],
+['LumApps','C','France / Paris / Lyon','High','Country Marketing Manager, Field Marketing, Product Marketing','found','Country Marketing Manager: резюме отправлено. Customer Marketing Manager: не подано','apply','Подать на Customer Marketing Manager. По Country Marketing Manager ждать','base'],
+['Pigment','C','France / Paris','High','Product Marketing, Revenue Marketing, Campaign Manager','rejected','Отказ 07.11.23','skip','Только при новой вакансии',''],
+['Brevo','C','France / Paris','High','CRM Marketing, Partner Marketing, Growth Marketing','silent','Подано 01.08.25, ответа нет','skip','13 месяцев тишины: считать закрытым',''],
+['Spendesk','C','France / Paris','High','Marketing Ops, Product Marketing, Growth Marketing','rejected','Отказ 22.09.25','skip','Только при новой вакансии',''],
+['Qonto','C','France / Paris','High','Customer Engagement Marketing, CRM Marketing, Growth','rejected','Отказ 30.10.24','skip','Только при новой вакансии',''],
+['Akeneo','C','France / Paris / Nantes','High','Regional Marketing, Partner Marketing, Campaign Manager','checked','Нанимает 100+, в основном R&D в Нанте. Маркетинг-вакансия не подтверждена','watch','Автомониторинг раз в 2 дня',''],
+['Partoo','C','France / Paris','High','Global Marketing, Product Marketing, Demand Gen','rejected','Отказ 07.03.24','skip','Только при новой вакансии',''],
+['GitGuardian','C','France / Paris','High','Growth Marketing, Demand Gen, Field Marketing','checked','Director Demand Gen только NYC (hybrid), Франция не рассматривается','skip','Не подходит по локации',''],
+['Photoroom','C','France / Paris / Remote Europe','High','Enterprise Marketing, Marketing Ops, Growth Marketing','found','Senior Growth Marketing открыта, не подано','apply','Подать, growth-акцент','base'],
+['Mirakl','C','France / Paris','High','Growth Marketing, Demand Gen, Product Marketing','rejected','Отказ 26.08.24','skip','Только при новой вакансии',''],
+['Contentsquare','C','France / Paris','High','Product Marketing, Field Marketing, Customer Marketing','checked','Только Demand Gen Marketing Intern (US remote), senior-роли во Франции нет','watch','Ждать senior-роль во Франции',''],
+['Dataiku','C','France / Paris','High','Field Marketing, Demand Gen, Product Marketing','rejected','Отказ 2021','skip','Только при новой вакансии',''],
+['Agorapulse','C','France / Paris','High','Demand Generation, Growth Marketing, Campaign Manager','found','Demand Generation Manager EMEA открыта, не подано','apply','Подать, близко к профилю demand gen','field'],
+['H Company','C','France / Paris','High','Growth Marketing, Lead Generation, AI Marketing','inprocess','Интервью 23.07.26, после него тишина','wait','Больше 2 месяцев без ответа: follow-up рекрутёру','base'],
+['Edflex','C','France / Paris','High','Growth Marketing B2B, Campaign Manager','found','Growth Marketing & Outbound B2B найдена 08.09, не подана. По мониторингу закрыта','watch','Ждать новых вакансий',''],
+['Rise Up','C','France / Paris','High','Marketing Manager, Demand Gen, Content Marketing','checked','Demand Gen Manager найдена, дата не подтверждена. Content Marketing Manager тоже в списке','watch','Проверить вручную, если жива, подать','field'],
+['Payhawk','C','France / Paris / EMEA','High','Demand Generation, Revenue Marketing','found','Global Demand Gen Manager и Senior Marketing Manager France открыты, не подано','apply','Подать на обе, первой Global Demand Gen','field'],
+['Bizzdesign','C','France / Paris','High','Field Marketing, Marketing Automation','checked','Команда Marketing и Demand Gen есть, открытой роли нет','watch','Автомониторинг раз в 2 дня',''],
+['Box','C','France / Paris','High','Regional Marketing, Field Marketing','checked','Открытая роль не найдена','watch','Автомониторинг раз в 2 дня',''],
+['Pennylane','C','France / Paris','High','GTM Manager, Product Marketing, CRM Marketing','inprocess','Подано 26.08.26, ждём ответа','wait','Прошло 5 недель: follow-up','base'],
+['PayFit','C','France / Paris','High','Demand Gen, Growth Marketing, Content Marketing','checked','Открыта только стажировка по growth, senior-роли нет','watch','Ждать senior-роль',''],
+['Aircall','C','France / Paris','High','Demand Gen, Field Marketing, Product Marketing','rejected','Отказ 2021 и 2023','skip','Только при новой вакансии',''],
+['AB Tasty','C','France / Paris','High','Growth Marketing, Product Marketing, Demand Gen','checked','Senior Growth Marketing Manager France & Southern Europe была, закрыта','watch','Ждать повторного открытия',''],
+['Didomi','C','France / Paris','High','Product Marketing, Demand Gen, Content Marketing','checked','Field Marketing Manager Northern Europe открыта, но нужен немецкий','skip','Не подходит по языку',''],
+['Doctolib','C','France / Paris','Новая','Field Marketing, B2B Marketing (роли уточнить)','found','Field Marketing Manager (в мета-данных Senior B2B Event Manager), Paris: страница обновлена 03.09.26, открытость не подтверждена','apply','Открыть страницу, убедиться что роль активна, затем подать','field'],
+['Algolia','C','France / Paris','Новая','Field и Partner Marketing, Product Marketing','checked','Проверено 29.09: в Париже маркетинг-вакансий нет, открыт только VP Brand Marketing (США)','watch','Автомониторинг раз в 2 дня',''],
+['Owkin','C','France / Paris','Новая','Marketing (роли уточнить)','new','Страница вакансий не открылась без JavaScript, проверить не удалось','watch','Проверить страницу вакансий вручную',''],
+['Ledger','C','France / Paris','Новая','Marketing (роли уточнить)','new','Страница вакансий не открылась без JavaScript, проверить не удалось','watch','Проверить страницу вакансий вручную',''],
+['Shift Technology','C','France / Paris','Новая','Marketing (роли уточнить)','new','Вакансии не проверялись','watch','Добавить в автомониторинг',''],
+['Hugging Face','C','France / Paris','Новая','Marketing (роли уточнить)','new','Вакансии не проверялись, в Париже открыто около 30 позиций по Glassdoor','watch','Добавить в автомониторинг',''],
+['LightOn','C','France / Paris','Новая','Marketing (роли уточнить)','new','Вакансии не проверялись','watch','Добавить в автомониторинг',''],
+['Poolside','C','France / Paris','Новая','Marketing (роли уточнить)','new','Вакансии не проверялись','watch','Добавить в автомониторинг',''],
+['UPTOO','C','France / Paris','—','Growth Marketing Manager, B2B Lead Generation (найдена через LinkedIn)','inprocess','Подано 08.09.26, тест Boost пройден','wait','Ждать. Через 3 недели написать рекрутёру','base'],
+['Artefact','C','France / Paris','—','B2B Growth Marketing Manager, Marketing Automation Specialist (найдена отдельно)','found','2 открытые вакансии, не подано','apply','Подать на B2B Growth Marketing Manager','base'],
+['Kramp Groep','B','Netherlands / Varsseveld','—','Senior Marketing Innovation Specialist: marketing automation и personalization','found','Вакансия открыта, локация и remote не подтверждены, не подано','apply','Сначала уточнить локацию и remote, затем подать','base']
+];
+
+/* [компания, вакансия, ссылка, открыта, шаг, текст, cv] */
+var FV=[
+['Payhawk','Global Demand Generation Manager','https://payhawk.com/careers/4827563101/global-demand-generation-manager',1,'apply','Подать первой','field'],
+['Agorapulse','Demand Generation Manager, EMEA','https://www.welcometothejungle.com/en/companies/agorapulse/jobs/demand-generation-manager-emea',1,'apply','Подать','field'],
+['LumApps','Customer Marketing Manager, France','https://job.lumapps.com/jobs/8280451-customer-marketing-manager-france',1,'apply','Подать','base'],
+['Payhawk','Senior Marketing Manager, France','https://payhawk.com/careers/4565919101/senior-marketing-manager-france',1,'apply','Подать вместе с Global Demand Gen','field'],
+['Mistral AI','Senior, Technical Product Marketing (Paris / London)','https://jobs.lever.co/mistral',1,'apply','Подать, сверить технические требования','base'],
+['Doctolib','Field Marketing Manager / Senior B2B Event Manager, Paris','https://careers.doctolib.com/jobs/field-marketing-manager-x-f-m-7675471003/',2,'apply','Сначала убедиться, что вакансия активна','field'],
+['Photoroom','Senior Growth Marketing (remote и Paris)','https://jobgether.com/offer/69d45ef4aba5fafceefedbcb-senior-growth-marketing',1,'apply','Подать, growth-акцент','base'],
+['Artefact','B2B Growth Marketing Manager (вне исходного списка)','https://job-boards.greenhouse.io/artefactjobs/jobs/8095395002',1,'apply','Подать','base'],
+['Artefact','Spécialiste Marketing & Communication Digitale (вне исходного списка)','https://job-boards.greenhouse.io/artefactjobs/jobs/8286787002',1,'apply','Подать после B2B Growth, ниже приоритет','base'],
+['Kramp Groep','Senior Marketing Innovation Specialist (вне исходного списка, Нидерланды)',null,1,'apply','Уточнить локацию и remote, потом подать','base'],
+['LumApps','Country Marketing Manager (Field & Demand Gen), France','https://job.lumapps.com/jobs/7685015-country-marketing-manager-field-demand-gen-manager-france',1,'wait','Резюме уже отправлено, ждать ответа','field'],
+['Mistral AI','Demand Generation Lead (закрыта, найдена 08.09)','https://startup.jobs/demand-generation-lead-mistral-ai-7991998',0,'watch','Закрыта, вместо неё открыта Technical Product Marketing',''],
+['Edflex','Growth Marketing & Outbound B2B','https://www.growthtalent.org/jobs/growth-marketing/edflex/growth-marketing-outbound-b2b-edflex',0,'watch','Вакансия закрыта, следить за новыми','']
+];
+
+var BL=[["HABIB MATTHIEU CONSEIL", "Paris", "Office 365", "C"], ["ACCENTURE SAS", "Toulouse", "Azure", "A/B"], ["SAS IZENCIA", "Ivry-sur-Seine", "Exchange / End-User Services", "B"], ["ACADIR", "Dole", "Office 365", "C"], ["Delphisoft SA", "La Tour-du-Pin", "Dynamics AX/GP/NAV/SL", "B+"], ["BT Blue / Openhost", "Orvault", "Azure / Microsoft collaboration", "B"], ["ORG-INFOR / CGlobal", "Chalon-sur-Saône", "Exchange / IT / telecoms", "C"], ["INFORSUD TECHNOLOGIES", "Bozouls", "Windows / IT services", "B/C"], ["PRO IT CONSEIL", "Ivry-sur-Seine", "Office 365", "B/C"], ["Synum", "Neuilly-sur-Seine", "Enterprise Mobility & Security", "B/C"], ["Army Of Quants", "Paris", "Azure", "B"], ["IT BLM", "La Madeleine", "Exchange / Messaging", "C"], ["NIS GROUP", "Fagnières", "Azure", "B/C"], ["VRITconsult", "Cattenom", "Windows", "C"], ["M2i Réseau Valor", "Viroflay", "Office 365", "B/C"], ["CLK INFORMATIQUE", "Epinouze", "Office 365", "C"], ["Delphisoft France", "La Tour-du-Pin", "Dynamics 365", "B+"], ["Geek-Inc.", "Montauban", "Azure / software development", "B"], ["MISMO INFORMATIQUE", "Changé", "Azure / management solutions", "B"], ["ARA Informatique SAS", "Annonay", "Windows / infrastructure / software", "C"], ["AXITEN", "Paris", "Office 365 / Microsoft 365 adoption", "B"], ["SYNAPS INFORMATIQUE", "Challes-les-Eaux", "Exchange / Microsoft cloud / Teams / Copilot", "B"], ["Amg-it", "Rambouillet", "Microsoft 365 / ESN", "B/C"], ["HBJR Consultants / ALMA", "Saint-Martin-d'Hères", "Exchange / IT cooperative", "C"], ["JALIX", "Crépy-en-Valois", "Azure", "B/C"], ["POINT BASE SA", "Montigny-le-Bretonneux", "Office 365", "B/C"], ["INEAT PARIS", "Paris", "Office 365 / Modern Workplace / Intranet", "B+"], ["NT&S Sarl", "Aix-en-Provence", "Azure / infrastructure", "C"], ["NET PACK COM", "Blois", "IT services", "C"], ["I.R.T CONSEILS", "Aureilhan", "Office 365 / Sage / SIRH", "C"], ["Dynamips", "Pacé", "Azure / Microsoft for PME", "B"], ["SOCIETE CARM2I", "La Tranche-sur-Mer", "Office 365", "C"], ["H3-VAELIA", "Périgny", "Azure / training", "B/C"], ["KINCY", "Marseille", "Office 365 / IT services", "B/C"], ["5EME AVENUE", "Puteaux", "Microsoft 365 / SFR Business", "B/C"], ["PI Services Group", "Noisy-le-Grand", "Azure / Microsoft platforms", "B+"], ["IGES", "Brunstatt", "Office 365 / SQL / Windows", "C"], ["4 OFFICE", "Saint-André-sur-Orne", "Azure", "C"], ["IDRESEAU", "Sarreguemines", "Azure", "C"], ["Odiwi", "Carquefou", "Office 365", "C"], ["ARCHYBALD / IMS PARTNERS", "Lutterbach", "Microsoft 365 / infrastructure", "B/C"], ["3SR", "Ares", "Azure / security systems", "C"], ["ELZON", "Paris", "Office 365 / IT for architecture firms", "C"], ["DSInnov", "Saint-Ouen", "Azure", "B/C"], ["Infrastructure Services", "Gennevilliers", "Office 365", "C"], ["INGEDUSCOM", "Metz", "Office 365 / Azure / infogérance", "C"], ["AMJ GROUPE", "Pacé", "Exchange / IT deployment", "C"], ["DEVENSYS", "Montpellier", "Azure / Cybersecurity", "B+"], ["CCL CONSULTING", "Castelmaurou", "Azure / consulting", "C"], ["Xelya", "Saint-Cloud", "Power BI / legal SaaS", "B+"], ["AISI", "Saint-Mandé", "Windows / data protection", "C"], ["BSI SAS", "Richardménil", "SQL / IT expertise", "C"], ["ALARA", "La Roque-d'Anthéron", "Azure / consulting", "C"], ["GSTI", "Joué-lès-Tours", "Office 365 / MSP", "C"], ["SUDELECTRO.COM", "Biot", "Windows / IT retail/services", "C"], ["ARESTE INFORMATIQUE", "Aubière", "Exchange / Resadia", "C"], ["alt-up", "Paris", "Microsoft 365 / pure player Microsoft", "B+"], ["Exodata OI", "Paris", "Office 365 / security / MSP", "B"], ["ALIASYS", "Antony", "Office 365 / external CIO", "C"], ["AXONE GROUP / Koesio Managed Services", "Paris", "Exchange / managed services", "B"], ["AMIELEC", "Saint-Priest-en-Jarez", "Azure / IT reseller", "C"], ["HELIAQ / Koesio Corporate Technologies", "Nantes", "Azure / managed services", "B"], ["PRO-IT", "Sin-le-Noble", "Office 365", "C"], ["ACTIVUS-Services", "Toulouse", "Azure / ESN / consulting / software", "B"], ["ESKAPE", "Saint-Avertin", "Azure / ERP integrator", "B+"], ["ATN GROUPE", "Meylan", "Azure / cybersecurity / hybrid infrastructure", "B"], ["Senetic S.A.", "Paris", "Azure / reseller", "B/C"], ["AYCOM", "Boulogne-sur-Mer", "Azure / IT services", "C"], ["TRANSITIONAL", "Malakoff", "Dynamics 365 / SaaS solutions", "B+"], ["1FOPRESTA", "Montesson", "Exchange / IT services", "C"], ["OSLO", "Villeneuve d'Ascq", "Office 365", "C"], ["LEASEINFO", "Mériel", "Windows / SSII", "C"], ["VERTEGO INFORMATIQUE", "Pau", "Azure / training", "C"], ["ID2 By Tibco", "Saran", "Azure / infrastructure", "B/C"], ["AB EXPERIENCE", "Amiens", "Azure / support maintenance", "C"]];
+var BLROWS=BL.map(function(r){
+  var koes=/Koesio/.test(r[0]);
+  var nx=['reserve','Резерв: проверить сайт, если шорт-лист исчерпан',''];
+  if(r[0].indexOf('AXONE')===0) nx=['spont','Спонтанная на всю группу Koesio (аудит: маркетинга нет в 40 из 67 позиций)','field'];
+  if(r[0].indexOf('HELIAQ')===0) nx=['reserve','Группа Koesio: заявка идёт через AXONE',''];
+  return [r[0],'A','France / '+r[1],r[3],'Microsoft-фокус: '+r[2],'backlog','Не проверялась',nx[0],nx[1],nx[2]];
+});
+var TR_RANK={C:0,B:1,A:2},NX_RANK={apply:0,wait:1,spont:2,watch:3,skip:4,reserve:5};
+SL.sort(function(a,b){return TR_RANK[a[1]]-TR_RANK[b[1]]||NX_RANK[a[7]]-NX_RANK[b[7]]});
+var ALL=SL.concat(BLROWS);
+function isFR(r){return r[2].indexOf('France')===0}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function cnt(a,f){return a.filter(f).length}
+function nxHTML(t,txt,cv){
+  return '<span class="badge b-'+t+'">'+NEXT[t]+'</span>'+(cv?'<span class="cv '+cv+'">'+CVN[cv]+'</span>':'')+(txt?'<span class="tx">'+esc(txt)+'</span>':'');
+}
+
+/* сводка */
+var frSL=SL.filter(isFR), frAll=ALL.filter(isFR);
+var contact=cnt(SL,function(r){return r[5]==='inprocess'||r[5]==='rejected'||r[5]==='silent'});
+var toApply=FV.filter(function(v){return v[4]==='apply'&&v[3]}).length;
+var applyCo=cnt(SL,function(r){return r[7]==='apply'});
+document.getElementById('heroTitle').textContent=frAll.length+' компании во Франции. '+toApply+' вакансий ждут отклика.';
+document.getElementById('heroText').textContent=frSL.length+' в шорт-листе (44 из исходного xlsx; Veeam, UPTOO, Artefact найдены отдельно; 8 новых AI-компаний добавлено 29.09, их вакансии в основном ещё не проверены), '+cnt(BLROWS,function(){return 1})+' в резерве. Отдельно в списке Kramp Groep (Нидерланды), он не входит в счёт по Франции.';
+var cAll=cnt(frAll,function(r){return r[1]==='C'}), cLive=FV.filter(function(v){var r=SL.filter(function(x){return x[0]===v[0]})[0];return v[3]===1&&v[4]==='apply'&&r&&r[1]==='C'}).length;
+document.getElementById('focusC').textContent='Track C: активный поиск, '+cAll+' компаний, '+cLive+' открытых вакансий к подаче';
+document.getElementById('focusAB').textContent='Track A и B: фон, '+cnt(frAll,function(r){return r[1]!=='C'})+' компаний';
+var stats=[[frAll.length,'компаний во Франции'],[frSL.length,'в шорт-листе'],[contact,'реальный контакт (по почте)'],[toApply,'вакансий к подаче в '+applyCo+' компаниях']];
+document.getElementById('stats').innerHTML=stats.map(function(s){return '<div class="stat"><b class="num">'+s[0]+'</b><span>'+s[1]+'</span></div>'}).join('');
+
+/* найдено */
+document.getElementById('foundBody').innerHTML=FV.map(function(v){
+  var st=v[3]===2?'<span class="st">Не подтверждена</span>':v[3]?'<span class="st st-found">Открыта</span>':'<span class="st st-rejected">Закрыта по мониторингу</span>';
+  var link=v[2]?'<a href="'+v[2]+'" target="_blank" rel="noopener">открыть</a>':'<span class="st">нет прямой ссылки</span>';
+  return '<tr><td class="co">'+esc(v[0])+'</td><td class="'+(v[3]?'':'closed')+'">'+esc(v[1])+'</td><td>'+st+'</td><td class="nx">'+nxHTML(v[4],v[5],v[6])+'</td><td>'+link+'</td></tr>';
+}).join('');
+document.getElementById('foundSub').textContent=FV.length+' вакансий в '+new Set(FV.map(function(v){return v[0]})).size+' компаниях';
+document.getElementById('foundNote').innerHTML='<b>Порядок подачи:</b> Payhawk (Global Demand Gen) → Agorapulse → LumApps (Customer Marketing) → Payhawk (Senior Marketing Manager, France) → Mistral AI (Technical Product Marketing) → Photoroom → Artefact. Doctolib подавать после проверки страницы. Это рекомендация по близости к Field и Demand Gen профилю. Demand Generation Lead в Mistral и Edflex закрыты, LumApps Country Marketing Manager уже отправлен.';
+
+/* треки */
+var TR=[['C','Track C · активный поиск','французские tech и AI scale-ups','var(--tC)'],['B','Track B · фон','крупные enterprise-аккаунты','var(--tB)'],['A','Track A · фон','Microsoft-партнёры и интеграторы','var(--tA)']];
+document.getElementById('tracks').innerHTML=TR.map(function(t){
+  var s=cnt(frSL,function(r){return r[1]===t[0]}), b=cnt(BLROWS,function(r){return r[1]===t[0]});
+  return '<div class="track"><div class="tn"><b>'+t[1]+'</b><small>'+t[2]+'</small></div><div class="bar"><i style="width:'+(s/frAll.length*100)+'%;background:'+t[3]+'"></i><i class="bk" style="width:'+(b/frAll.length*100)+'%;background:'+t[3]+'"></i></div><div class="tc num">'+(s+b)+'</div></div>';
+}).join('');
+
+/* приоритет и статус */
+function bars(el,items,max){
+  document.getElementById(el).innerHTML=items.map(function(i){return '<div class="mrow"><div class="l">'+i[0]+'</div><div class="t"><i style="width:'+(i[1]/max*100)+'%"></i></div><div class="n num">'+i[1]+'</div></div>'}).join('');
+}
+bars('prioBars',[['A+',cnt(frSL,function(r){return r[3]==='A+'})],['A',cnt(frSL,function(r){return r[3]==='A'})],['High (Track C)',cnt(frSL,function(r){return r[3]==='High'})],['Без приоритета',cnt(frSL,function(r){return r[3]==='—'})]],frSL.length);
+bars('statusBars',[
+ ['В процессе',cnt(SL,function(r){return r[5]==='inprocess'})],
+ ['Найдено, не подано',cnt(SL,function(r){return r[5]==='found'})],
+ ['Отказ',cnt(SL,function(r){return r[5]==='rejected'})],
+ ['Без ответа',cnt(SL,function(r){return r[5]==='silent'})],
+ ['Проверено, вакансии нет',cnt(SL,function(r){return r[5]==='checked'})],
+ ['Новые, не проверены',cnt(SL,function(r){return r[5]==='new'})],
+ ['Резерв, не проверялась',BLROWS.length]
+],ALL.length);
+
+/* общая таблица */
+var chipVal='';
+var qEl=document.getElementById('q'),scEl=document.getElementById('scope'),trEl=document.getElementById('track'),prEl=document.getElementById('prio');
+scEl.innerHTML='<option value="sl">Шорт-лист ('+SL.length+')</option><option value="bl">Резерв ('+BLROWS.length+')</option><option value="all">Все ('+ALL.length+')</option>';
+var prios=[];ALL.forEach(function(r){if(prios.indexOf(r[3])<0)prios.push(r[3])});
+var order=['A+','A','High','Новая','A/B','B+','B','B/C','C','—'];
+prios.sort(function(a,b){return order.indexOf(a)-order.indexOf(b)});
+prEl.innerHTML='<option value="">Любой приоритет</option>'+prios.map(function(p){return '<option value="'+p+'">'+(p==='—'?'Без приоритета':p)+'</option>'}).join('');
+document.getElementById('allSub').textContent=frAll.length+' во Франции и Kramp Groep из Нидерландов';
+
+function renderChips(){
+  var keys=['apply','wait','spont','watch','skip','reserve'];
+  document.getElementById('chips').innerHTML='<button class="chip" data-v="" aria-pressed="'+(chipVal===''?'true':'false')+'">Все шаги <span class="n">'+ALL.length+'</span></button>'+
+   keys.map(function(k){return '<button class="chip" data-v="'+k+'" aria-pressed="'+(chipVal===k?'true':'false')+'">'+NEXT[k]+' <span class="n">'+cnt(ALL,function(r){return r[7]===k})+'</span></button>'}).join('');
+}
+function render(){
+  var q=qEl.value.trim().toLowerCase(),sc=scEl.value,t=trEl.value,p=prEl.value;
+  var src=sc==='sl'?SL:sc==='bl'?BLROWS:ALL;
+  var rows=src.filter(function(r){
+    if(t&&r[1]!==t)return false;
+    if(p&&r[3]!==p)return false;
+    if(chipVal&&r[7]!==chipVal)return false;
+    if(q&&(r[0]+' '+r[4]+' '+r[6]+' '+r[8]).toLowerCase().indexOf(q)<0)return false;
+    return true;
+  });
+  document.getElementById('body').innerHTML=rows.map(function(r){
+    return '<tr><td><div class="co">'+esc(r[0])+'</div><div class="sm">'+esc(r[2])+'</div></td><td><span class="pill '+r[1]+'">Track '+r[1]+'</span></td><td class="st num">'+(r[3]==='—'?'—':esc(r[3]))+'</td><td class="st">'+esc(r[4])+'</td><td><span class="st st-'+r[5]+'">'+STAGE[r[5]]+'</span><div class="sm">'+esc(r[6])+'</div></td><td class="nx">'+nxHTML(r[7],r[8],r[9])+'</td></tr>';
+  }).join('')||'<tr><td colspan="6" class="st">Ничего не найдено. Смените фильтры.</td></tr>';
+  document.getElementById('count').textContent='Показано '+rows.length+' из '+src.length;
+  renderChips();
+}
+document.getElementById('chips').addEventListener('click',function(e){
+  var b=e.target.closest('.chip');if(!b)return;
+  chipVal=b.getAttribute('data-v');
+  if(chipVal==='reserve'&&scEl.value==='sl')scEl.value='all';
+  render();
+});
+[qEl].forEach(function(el){el.addEventListener('input',render)});
+[scEl,trEl,prEl].forEach(function(el){el.addEventListener('change',render)});
+render();
+</script>
+
+</body></html>
