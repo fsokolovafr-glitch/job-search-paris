@@ -31,6 +31,20 @@ CREATE INDEX IF NOT EXISTS idx_job_events_key ON job_events(job_key);
 CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(current_status);
 """
 
+PRIVATE_FIELDS = {'application_status', 'applied', 'applied_date', 'response_date',
+                  'interview_date', 'follow_up_date', 'submission_error', 'cv_variant',
+                  'contact_status', 'notes', 'next_step', 'fit_status'}
+
+
+def public_payload(item):
+    def clean(value):
+        if isinstance(value, dict):
+            return public_payload(value)
+        if isinstance(value, list):
+            return [clean(entry) for entry in value]
+        return value
+    return {key: clean(value) for key, value in item.items() if key not in PRIVATE_FIELDS}
+
 
 def norm(value):
     value = unicodedata.normalize('NFKC', str(value))
@@ -55,8 +69,15 @@ def job_key(company, title, url):
 
 
 class HistoryStore:
-    def __init__(self, path):
+    def __init__(self, path, readonly=False):
         self.path = Path(path)
+        self.readonly = readonly
+        if readonly:
+            if not self.path.is_file():
+                raise FileNotFoundError(self.path)
+            self.db = sqlite3.connect('file:{}?mode=ro'.format(self.path.resolve()), uri=True)
+            self.db.row_factory = sqlite3.Row
+            return
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.db = sqlite3.connect(self.path)
         self.db.row_factory = sqlite3.Row
@@ -78,6 +99,8 @@ class HistoryStore:
         self.close()
 
     def initialized(self):
+        if not self.db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='metadata'").fetchone():
+            return False
         return self.db.execute("SELECT 1 FROM metadata WHERE key='bootstrap'").fetchone() is not None
 
     def _event(self, key, kind, at, details):
@@ -86,6 +109,7 @@ class HistoryStore:
 
     def upsert_companies(self, companies, timestamp):
         for item in companies:
+            item = public_payload(item)
             match = next((r for r in self.db.execute('SELECT * FROM companies')
                           if norm(r['company_name']) == norm(item['company'])), None)
             name = match['company_name'] if match else item['company']
@@ -107,6 +131,7 @@ class HistoryStore:
             self.db.execute("INSERT INTO metadata VALUES('bootstrap','1')")
 
     def _save_job(self, item, observation, at, imported=False):
+        item = public_payload(item)
         current = next((r for r in self.db.execute('SELECT * FROM jobs')
                         if canonical(r['url']) == canonical(item['url'])), None)
         key = current['job_key'] if current else job_key(item['company'], item['title'], item['url'])
@@ -118,10 +143,10 @@ class HistoryStore:
             if not imported:
                 self._event(key, 'JOB_DISCOVERED', at, {'status': status, 'url': item['url']})
             return
-        previous = json.loads(current['payload'])
+        previous = public_payload(json.loads(current['payload']))
         if imported:
             # Enrich legacy rows without changing their confirmed status/history.
-            payload = dict(item, **previous)
+            payload = public_payload(dict(item, **previous))
             self.db.execute('UPDATE jobs SET payload=? WHERE job_key=?', (json.dumps(payload), key))
             return
         if not observation:
@@ -157,12 +182,14 @@ class HistoryStore:
                  json.dumps(dict(result, mode=mode), ensure_ascii=False)))
 
     def export_jobs(self):
-        return [dict(json.loads(r['payload']), company=r['company_name'], title=r['title'], url=r['url'],
-                     status=r['current_status'], found_date=r['first_seen'][:10],
-                     applied=json.loads(r['payload']).get('applied', False)) for r in self.db.execute('SELECT * FROM jobs ORDER BY id')]
+        jobs = [dict(public_payload(json.loads(r['payload'])), company=r['company_name'], title=r['title'], url=r['url'],
+                     status=r['current_status'], found_date=r['first_seen'][:10])
+                for r in self.db.execute('SELECT * FROM jobs ORDER BY id')]
+        return jobs
 
     def export_companies(self):
-        return [dict(json.loads(r['payload']), company=r['company_name']) for r in self.db.execute('SELECT * FROM companies ORDER BY id')]
+        return [dict(public_payload(json.loads(r['payload'])), company=r['company_name'])
+                for r in self.db.execute('SELECT * FROM companies ORDER BY id')]
 
     def export_tracker(self):
         legacy = self.db.execute("SELECT value FROM metadata WHERE key='legacy_tracker'").fetchone()

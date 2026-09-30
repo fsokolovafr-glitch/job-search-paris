@@ -20,11 +20,11 @@ class AuthorityTests(unittest.TestCase):
     def test_keys(self):
         self.assertEqual(job_key('Société Générale',' Senior\u00a0 Manager ',self.job['url']),job_key('SOCIETE GENERALE','senior manager',self.job['url']+'?utm_source=x'))
         self.assertNotEqual(job_key('AB','C',self.job['url']),job_key('A','BC',self.job['url']))
-    def test_bootstrap_once_and_preserve_application(self):
+    def test_bootstrap_strips_private_application_fields(self):
         self.store.bootstrap([dict(self.job, applied=True, application_status='rejected')], [], {'check_history':[]})
         self.store.bootstrap([self.job], [], {'check_history':[]})
-        self.assertTrue(self.store.export_jobs()[0]['applied'])
-        self.assertEqual(self.store.export_jobs()[0]['application_status'],'rejected')
+        self.assertNotIn('applied', self.store.export_jobs()[0])
+        self.assertNotIn('application_status', self.store.export_jobs()[0])
         self.assertEqual(self.store.db.execute('SELECT COUNT(*) FROM job_events').fetchone()[0],0)
     def test_skipped_unknown_and_unchanged_do_not_emit_update(self):
         self.record(self.job)

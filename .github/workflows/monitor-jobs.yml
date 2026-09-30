@@ -1,63 +1,60 @@
 name: Monitor jobs
 on:
   schedule:
-    # Requested calendar cadence: odd days of month, 10:00 UTC, not exactly 48h.
     - cron: '0 10 */2 * *'
+  push:
+    branches: [main]
+    paths: ['sources/artifact-*.json', 'scripts/**', '.github/workflows/monitor-jobs.yml']
   workflow_dispatch:
+    inputs:
+      action:
+        type: choice
+        options: [monitor, sync]
+        default: monitor
 permissions:
   contents: write
 concurrency:
-  group: job-monitor
+  group: job-pipeline-main
   cancel-in-progress: false
 jobs:
   monitor:
-    # Enable only after configuring Brave API key and reviewing the live pilot.
-    if: vars.MONITOR_ENABLED == 'true'
+    # Enabled by default; explicit opt-out still supported.
+    if: vars.MONITOR_ENABLED != 'false'
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.repository.default_branch }}
+          ref: main
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Test
+      - name: Test before writing data
         run: python -m unittest discover -s tests -v
-      - name: Live monitoring
+      - name: Import, monitor and generate
         env:
           BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
-        run: python scripts/check-jobs.py --mode live
-      - name: Validate tracker
+          PIPELINE_ACTION: ${{ github.event_name == 'push' && 'sync' || inputs.action || 'monitor' }}
+        run: python scripts/automation.py
+      - name: Validate state and derived files
         run: python scripts/update-tracker.py
-      - name: Commit data and reports
-        env:
-          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+      - name: Commit generated data
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/companies-shortlist.json data/jobs.json data/job-search.db data/job-tracking.json reports/
+          git add data/ dashboard/ reports/
           if ! git diff --cached --quiet; then
-            git commit -m 'Update job monitoring data and reports'
-            git push origin "HEAD:$DEFAULT_BRANCH"
+            git commit -m 'Sync pipeline data, dashboard and monitoring reports'
+            git push origin HEAD:main
           fi
-      - name: Preserve results if push fails
-        if: failure()
+      - name: Preserve results and recovery copy
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: monitoring-recovery
+          name: job-pipeline-results
           path: |
-            data/jobs.json
+            data/*.json
             data/job-search.db
-            data/job-tracking.json
+            dashboard/
             reports/
-      - name: Flag partial coverage after saving results
-        run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          history = json.loads(Path('data/job-tracking.json').read_text())['check_history']
-          if history[-1]['status'] != 'completed':
-              raise SystemExit('Partial monitoring: inspect the saved report for unknown results.')
-          PY

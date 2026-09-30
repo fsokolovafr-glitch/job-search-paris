@@ -1,4 +1,4 @@
-"""Monitor three job platforms, never employer sites. Python 3.9+."""
+"""Conservative vacancy monitoring with optional discovery. Python 3.9+."""
 import argparse
 import copy
 import hashlib
@@ -66,6 +66,28 @@ def platform_for(url):
 
 def has_phrase(text, phrase):
     return bool(re.search(r'(?<!\w)' + re.escape(normalize(phrase)) + r'(?!\w)', normalize(text)))
+
+
+def allowed_job_page(url, config):
+    if platform_for(url):
+        return True
+    try:
+        p = urlsplit(url)
+        if p.scheme != 'https' or p.username or p.password or p.port not in (None, 443):
+            return False
+        # Exact public hosts and path prefixes reviewed by the owner. Config does
+        # not grant blanket permission to arbitrary redirects or internal hosts.
+        approved = {
+            'payhawk.com': '/careers/', 'job.lumapps.com': '/jobs/',
+            'careers.doctolib.com': '/jobs/', 'job-boards.greenhouse.io': '/artefactjobs/jobs/',
+            'jobs.ashbyhq.com': '/mistral.ai/', 'jobgether.com': '/offer/',
+            'startup.jobs': '/demand-generation-lead-mistral-ai-',
+            'www.growthtalent.org': '/jobs/', 'growthtalent.org': '/jobs/',
+        }
+        return (config.get('check_reviewed_employer_sites', False) and
+                p.hostname in approved and p.path.startswith(approved[p.hostname]))
+    except (ValueError, TypeError):
+        return False
 
 
 def title_matches(title, config):
@@ -150,7 +172,8 @@ def classify(page, config, now, expected=None):
         return 'UNKNOWN', page.get('error', 'HTTP ' + str(status)), None
     candidates = [j for j in job_postings(page.get('body', '')) if eligible(j, config)]
     if expected:
-        candidates = [j for j in candidates if normalize(j['hiringOrganization']['name']) == normalize(expected['company'])]
+        names = [expected['company']] + expected.get('company_aliases', [])
+        candidates = [j for j in candidates if normalize(j['hiringOrganization']['name']) in set(map(normalize, names))]
     if len(candidates) != 1:
         return 'UNKNOWN', 'missing_or_ambiguous_matching_JobPosting', None
     job = candidates[0]
@@ -177,15 +200,19 @@ class NoRedirect(HTTPRedirectHandler):
 
 
 class LiveProvider:
-    def __init__(self, config):
+    def __init__(self, config, discovery='required'):
         self.config = config
         self.key = os.environ.get('BRAVE_SEARCH_API_KEY')
-        if not self.key:
+        self.discovery = discovery
+        if not self.key and discovery == 'required':
             raise ValueError('Set BRAVE_SEARCH_API_KEY; no monitoring data was changed.')
         self.opener = build_opener(NoRedirect())
 
     def search(self):
         """One global search per platform/role, independent of company count."""
+        if self.discovery == 'off' or not self.key:
+            return {'hits': [], 'errors': [], 'queries': [], 'query_count': 0,
+                    'discovery_status': 'disabled' if self.discovery == 'off' else 'missing_api_key'}
         hits, errors, sources = [], [], []
         queries = 0
         for platform, domains in PLATFORMS.items():
@@ -221,12 +248,12 @@ class LiveProvider:
         current = url
         # Follow at most five redirects, checking BEFORE every request.
         for _ in range(6):
-            if not platform_for(current):
+            if not allowed_job_page(current, self.config):
                 return {'status': 0, 'error': 'blocked_outside_allowed_job_pages'}
             for attempt in range(3):
                 try:
                     req = Request(current, headers={'User-Agent': 'JobSearchParis/2.0', 'Accept': 'text/html'})
-                    with self.opener.open(req, timeout=20) as response:
+                    with self.opener.open(req, timeout=self.config.get('fetch_timeout_seconds', 20)) as response:
                         body = response.read(3_000_001)
                         if len(body) > 3_000_000:
                             return {'status': 0, 'error': 'page_too_large'}
@@ -274,7 +301,7 @@ def validate(jobs):
     seen = set()
     for job in jobs:
         key = canonical(job['url'])
-        if key in seen or not job.get('title') or not job.get('company') or type(job.get('applied')) is not bool:
+        if key in seen or not job.get('title') or not job.get('company'):
             raise ValueError('Invalid or duplicate job')
         if job.get('status') not in ('UNKNOWN', 'LIVE', 'CLOSED'):
             raise ValueError('Invalid status')
@@ -291,22 +318,23 @@ def monitor(jobs, companies, config, provider, now):
     rejected = set()
     for company in companies:
         names = [normalize(company['company'])] + list(map(normalize, company.get('aliases', [])))
-        if company.get('contact_status') == 'rejected' or company.get('monitoring_status') in ('rejected', 'paused'):
+        if company.get('exclude_company') or company.get('monitoring_status') == 'paused':
             rejected.update(names)
-        else:
+        elif company.get('list') != 'backlog':
             priority.update(names)
     search = provider.search()
     result['search_queries'] = search['queries']
     result['query_count'] = search['query_count']
+    result['discovery_status'] = search.get('discovery_status', 'enabled')
     for err in search['errors']:
         result['unknown'].append(dict(err, company=err.get('platform', ''), title='WebSearch', url=''))
     known = {canonical(j['url']): j for j in jobs}
     queue = []
     queued = set()
-    for job in sorted(jobs, key=lambda item: item.get('last_checked', '')):
-        if job['status'] == 'CLOSED' and not job['applied'] and job.get('application_status') != 'rejected':
+    for job in sorted(jobs, key=lambda item: item.get('last_checked') or ''):
+        if job['status'] == 'CLOSED':
             continue  # Recheck a closed listing only if search finds it again.
-        if job['applied'] or job.get('application_status') == 'rejected' or normalize(job['company']) in rejected:
+        if normalize(job['company']) in rejected:
             queued.add(canonical(job['url']))
         else:
             queue.append((job['url'], job))
@@ -315,7 +343,7 @@ def monitor(jobs, companies, config, provider, now):
     queue = []
     for hit in search['hits']:
         url = hit.get('url', '')
-        if not platform_for(url):
+        if not allowed_job_page(url, config):
             result['excluded'].append({'url': url, 'reason': 'outside_allowed_job_pages'})
             continue
         key = canonical(url)
@@ -324,7 +352,7 @@ def monitor(jobs, companies, config, provider, now):
             queued.add(key)
     queue = [item for pair in zip_longest(saved_queue, queue) for item in pair if item is not None]
     for url, job in queue:
-        if not platform_for(url):
+        if not allowed_job_page(url, config):
             result['excluded'].append({'url': url, 'reason': 'outside_allowed_job_pages'})
             continue
         if result['pages_checked'] >= config['max_pages_per_run']:
@@ -334,7 +362,7 @@ def monitor(jobs, companies, config, provider, now):
         page = provider.fetch(url)
         result['pages_checked'] += 1
         result['sources'].append(url)
-        if page.get('final_url') and platform_for(page['final_url']):
+        if page.get('final_url') and allowed_job_page(page['final_url'], config):
             result['sources'].append(page['final_url'])
         status, reason, posting = classify(page, config, now, job)
         evidence = {'url': url, 'status': status, 'reason': reason, 'checked_at': now.isoformat(),
@@ -349,7 +377,7 @@ def monitor(jobs, companies, config, provider, now):
             if normalize(employer) in rejected:
                 continue
             job = {'company': employer, 'title': posting['title'], 'url': url, 'status': 'UNKNOWN',
-                   'found_date': result['date'], 'applied': False}
+                   'found_date': result['date']}
             jobs.append(job)
             result['new'].append(dict(evidence, company=employer, title=job['title'], priority=normalize(employer) in priority))
         previous = job['status']
@@ -374,13 +402,14 @@ def monitor(jobs, companies, config, provider, now):
     result['sources'] = sorted(set(result['sources']))
     result['new_jobs_found'] = len(result['new'])
     result['jobs_closed'] = len(result['closed'])
-    result['status'] = 'partial' if result['unknown'] else 'completed'
+    result['status'] = 'partial' if result['unknown'] or result['discovery_status'] == 'missing_api_key' else 'completed'
     return jobs, result
 
 
 def report(result, mode):
     lines = ['# Monitoring Report — ' + result['date'], '', '**{} / {}**'.format(mode.upper(), result['status']),
-             'Площадки: LinkedIn Jobs, Indeed, Welcome to the Jungle. Сайты компаний не открываются.',
+             'Площадки: LinkedIn Jobs, Indeed, Welcome to the Jungle; разрешённые карточки работодателей при включённой настройке.',
+             'Поиск новых вакансий: ' + result.get('discovery_status', 'enabled'),
              'MOCK: искусственные данные.' if mode == 'mock' else 'LIVE подтверждает подходящую разметку на момент проверки; полнота поиска не гарантируется.', '']
     for title, key in [('Новые вакансии', 'new'), ('Закрытые вакансии', 'closed'),
                        ('Повторно открытые вакансии', 'reopened'), ('Требуют проверки', 'unknown')]:
@@ -425,6 +454,9 @@ def save_run(output, jobs, result, mode, tracker, companies):
     (output / filename).write_text(body, encoding='utf-8')
     (reports / (result['date'] + '-report.md')).write_text(body, encoding='utf-8')
     write_json(reports / (run_id + '-' + mode + '.json'), result)
+    from pipeline import export_all
+    with HistoryStore(output / 'data/job-search.db') as store:
+        export_all(store, output)
 
 
 def main():
@@ -434,16 +466,20 @@ def main():
     parser.add_argument('--output', type=Path)
     parser.add_argument('--fixture', type=Path, default=ROOT / 'tests/fixtures/demo.json')
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--discovery', choices=['required', 'auto', 'off'], default='required')
+    parser.add_argument('--max-pages', type=int)
     args = parser.parse_args()
     root = args.root.resolve()
     if args.mode == 'mock' and (not args.output or args.output.resolve() == root):
         parser.error('Mock requires a separate --output directory.')
     output = args.output.resolve() if args.output else root
     config = read_json(root / 'data/config.json')
+    if args.max_pages is not None:
+        config['max_pages_per_run'] = args.max_pages
     if type(config['max_pages_per_run']) is not int or not 1 <= config['max_pages_per_run'] <= 100:
         parser.error('max_pages_per_run must be 1..100')
     fixture = read_json(args.fixture) if args.mode == 'mock' else None
-    provider = MockProvider(fixture) if fixture is not None else LiveProvider(config)
+    provider = MockProvider(fixture) if fixture is not None else LiveProvider(config, args.discovery)
     sandbox = None
     if args.dry_run:
         sandbox = tempfile.TemporaryDirectory()

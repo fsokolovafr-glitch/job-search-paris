@@ -40,6 +40,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(r['new_jobs_found'],1)
 
     def test_external_search_and_saved_urls_never_fetched(self):
+        self.cfg['check_reviewed_employer_sites'] = False
         self.f['jobs'].append({'company':'LumApps','title':'Field Marketing Manager',
                               'url':'https://job.lumapps.com/jobs/123','status':'LIVE','applied':False})
         _,r=self.run_fixture()
@@ -113,14 +114,14 @@ class Tests(unittest.TestCase):
         for body in ['<h1>Careers</h1>',self.page['body']*2]:
             self.assertEqual(m.classify({'status':200,'body':body},self.cfg,self.now)[0],'UNKNOWN')
 
-    def test_applied_and_rejected_roles_skipped(self):
+    def test_public_monitor_does_not_use_private_application_fields(self):
         self.f['jobs'][0]['applied']=True
         self.f['jobs'][1]['application_status']='rejected'
         _,r=self.run_fixture()
-        self.assertEqual(r['pages_checked'],1)
+        self.assertEqual(r['pages_checked'],3)
 
     def test_rejected_employer_is_not_added(self):
-        self.f['companies'][0]['contact_status']='rejected'
+        self.f['companies'][0]['exclude_company']=True
         _,r=self.run_fixture()
         self.assertEqual(r['new_jobs_found'],0)
         self.assertEqual(r['pages_checked'],1)

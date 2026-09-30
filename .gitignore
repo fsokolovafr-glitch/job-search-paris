@@ -5,6 +5,15 @@ __pycache__/
 .env.*
 !.env.example
 .DS_Store
+.obsidian/
 .monitor.lock
 *.tmp
 work/
+.coverage
+
+# Personal application history and source CVs never belong in this public repo.
+private/
+data/private/
+*.private.json
+Master_CV*
+CV_Faina_Sokolova_*
