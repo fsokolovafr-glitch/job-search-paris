@@ -15,6 +15,7 @@ if args.trend:
     args.days = int(args.trend[:-1])
 if args.days < 1:
     parser.error("--days must be positive")
-with HistoryStore(args.db) as store:
+with HistoryStore(args.db, readonly=True) as store:
+    if not store.initialized():
+        parser.error("database is not initialized")
     print(store.analytics_text(args.days), end="")
-

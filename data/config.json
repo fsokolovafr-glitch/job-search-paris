@@ -13,7 +13,8 @@
     "country marketing",
     "marketing terrain",
     "marketing partenaires",
-    "generation de demande"
+    "generation de demande",
+    "product marketing", "growth", "crm", "go-to-market", "marketing operations", "events"
   ],
   "excluded_keywords": [
     "intern",
@@ -31,6 +32,8 @@
     "marketing partenaires"
   ],
   "max_pages_per_run": 60,
+  "check_reviewed_employer_sites": false,
+  "fetch_timeout_seconds": 12,
   "search_scope": "all_matching_jobs_priority_companies_highlighted",
   "platforms": [
     "linkedin",
