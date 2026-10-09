@@ -1,0 +1,464 @@
+{
+  "date": "2026-10-09",
+  "checked_at": "2026-10-09T16:46:31.807947+00:00",
+  "new": [],
+  "closed": [],
+  "reopened": [],
+  "unknown": [
+    {
+      "url": "https://www.linkedin.com/jobs/view/4458199106/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "29c621b32e0cf11fcbc0c9a43f4f6db4db4a5d8644dc50452a332d265eafcb67",
+      "company": "Payhawk",
+      "title": "Product Marketing Manager",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4471511667/",
+      "status": "UNKNOWN",
+      "reason": "blocked_outside_allowed_job_pages",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "company": "HomeExchange",
+      "title": "Global Campaign Manager",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4471519449/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "61b575e54adf6703831906410aba162e3b8cf823b60409d99683b15d5cd2b7bd",
+      "company": "TISSIUM",
+      "title": "Marketing Operations Lead",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4444592744/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "f9f5726b2b21408367b26cb386294de78401eb01c22f30e77326d4d3518bef21",
+      "company": "Nabla",
+      "title": "Product Marketing Manager",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4473215156/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "303952ceb92c5c082a69bdf7a7135207e5dd302b787cc7647c164ecc09601db0",
+      "company": "Leonar (Licorne Society)",
+      "title": "Marketing Manager B2B",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4473216135/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "3fbdf323b3d135cb8d25aa3cb7cb1e2854c894452c59ca72c3c7af3472ad8f78",
+      "company": "Leonar (Licorne Society)",
+      "title": "Marketing & Acquisition 360°",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4465534422/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "6cac7c9770fe28d1e2d58e910156c131b61497d38a2e1c84c31740a334934740",
+      "company": "Edenred",
+      "title": "Demand Generation Manager",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4451517903/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "604e2ec2babaa2a6a22c4dcd912bf0b4af0d43654fdd77e3a5af66140308d1a4",
+      "company": "Verkada",
+      "title": "Field Marketing Manager, France",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4467648017/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "6b558d992463e7c4667ed481480e132b6825c3be194e02a947ede1ef784bc7b5",
+      "company": "Ledger",
+      "title": "CRM Lifecycle Specialist",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4470989456/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "7ee589f4bc851e0f8a0abc141301bad7401999d08ccd4012331a5433f329d107",
+      "company": "Base360.ai (The Flex)",
+      "title": "Founding Growth Marketer",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4473504607/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "1c1809238b14ec5dcda77f5a3a9927d99fdc7011d2756ef6085745fb7bdad9ae",
+      "company": "Referment",
+      "title": "Agentic GTM Operator",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4471905858/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "b5a87253d349d29690ae2a7d927df346b2e5a503a79574ac29cba53ae1d751ff",
+      "company": "Spinergie",
+      "title": "Growth Marketing Manager",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4462153691/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "df70c8de35d836b9f87203e3d647dfe1400a1a2f296fd2c87eb626b8ea928ad9",
+      "company": "Descartes Underwriting",
+      "title": "Senior Events Specialist",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4466067489/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "dabbd01132b9efa9120fb5744ea9d718bd47336f53af4bbbf27e9edd15321c3c",
+      "company": "En Carta Diagnostics",
+      "title": "Senior Marketing & Growth Manager",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4469678004/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "6dcf01aac0cc10fe7eb2b14d84dd83fa6db0f23870400aae0614a36fa28c7fda",
+      "company": "SMOORE",
+      "title": "Go-to-Market Manager",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4469158155/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "2ea06ad8c78966c49010ce3b933c1fdce8414f63af899295985b0a5147adae09",
+      "company": "Treatwell",
+      "title": "Marketing Manager, Partner Engagement & Advocacy",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4461735120/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "e10c4a1dd79e06ee7c87c05497117d2f9334a74a2b0287c9555789bd0b0945ba",
+      "company": "Joko",
+      "title": "CRM & Lifecycle Manager",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4466032909/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "81c4bb82200477a509486f6306d8ed87ac9ef5e1d7e6f2180541a86e78dedca8",
+      "company": "Hager",
+      "title": "Marketing Automation Platform Specialist",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4462459168/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "73de02dd9a8e3449b8e7a243efc8c204d9bfd8e2206fccf9768494dab5eed08b",
+      "company": "CybelAngel",
+      "title": "Head of Product Marketing & Growth",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4465762412/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "7910fdd2bd49280237a33b026269eff4eac88010ef98b88b9fed7935b16f9e60",
+      "company": "Guideflow / Sently (STATION F)",
+      "title": "Growth Manager / Head of Growth",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4467495137/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "48bed474add0636d82342b0c59b882ac77c006be7d46646c6b21d7dfdc123850",
+      "company": "SCOR",
+      "title": "Marketing Operations Lead",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4446330370/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "466a9a67a7b2bb3274f2fbd25aad62b527b9beb82e8cf2bce7aedf58d5ce155d",
+      "company": "Datadog",
+      "title": "Program Manager, Community Content & Events",
+      "priority": true
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4468030775/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "66302c4a071e5528814c0d3557a9d7683d124a8ad5762602b9eeb8f0c0200248",
+      "company": "Docusign",
+      "title": "Director, Demand & Field Marketing EMEA",
+      "priority": true
+    }
+  ],
+  "excluded": [
+    {
+      "url": "https://payhawk.com/careers/4827563101/global-demand-generation-manager",
+      "reason": "outside_allowed_job_pages"
+    },
+    {
+      "url": "https://jobgether.com/offer/69d45ef4aba5fafceefedbcb-senior-growth-marketing",
+      "reason": "outside_allowed_job_pages"
+    },
+    {
+      "url": "https://job.lumapps.com/jobs/7685015-country-marketing-manager-field-demand-gen-manager-france",
+      "reason": "outside_allowed_job_pages"
+    },
+    {
+      "url": "https://careers.doctolib.com/jobs/field-marketing-manager-x-f-m-7675471003/",
+      "reason": "outside_allowed_job_pages"
+    },
+    {
+      "url": "https://jobs.ashbyhq.com/mistral.ai",
+      "reason": "outside_allowed_job_pages"
+    }
+  ],
+  "observations": [
+    {
+      "url": "https://www.linkedin.com/jobs/view/4458199106/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "29c621b32e0cf11fcbc0c9a43f4f6db4db4a5d8644dc50452a332d265eafcb67"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4471511667/",
+      "status": "UNKNOWN",
+      "reason": "blocked_outside_allowed_job_pages",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4471519449/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "61b575e54adf6703831906410aba162e3b8cf823b60409d99683b15d5cd2b7bd"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4444592744/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "f9f5726b2b21408367b26cb386294de78401eb01c22f30e77326d4d3518bef21"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4473215156/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "303952ceb92c5c082a69bdf7a7135207e5dd302b787cc7647c164ecc09601db0"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4473216135/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "3fbdf323b3d135cb8d25aa3cb7cb1e2854c894452c59ca72c3c7af3472ad8f78"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4465534422/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "6cac7c9770fe28d1e2d58e910156c131b61497d38a2e1c84c31740a334934740"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4451517903/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "604e2ec2babaa2a6a22c4dcd912bf0b4af0d43654fdd77e3a5af66140308d1a4"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4467648017/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "6b558d992463e7c4667ed481480e132b6825c3be194e02a947ede1ef784bc7b5"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4470989456/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "7ee589f4bc851e0f8a0abc141301bad7401999d08ccd4012331a5433f329d107"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4473504607/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "1c1809238b14ec5dcda77f5a3a9927d99fdc7011d2756ef6085745fb7bdad9ae"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4471905858/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "b5a87253d349d29690ae2a7d927df346b2e5a503a79574ac29cba53ae1d751ff"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4462153691/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "df70c8de35d836b9f87203e3d647dfe1400a1a2f296fd2c87eb626b8ea928ad9"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4466067489/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "dabbd01132b9efa9120fb5744ea9d718bd47336f53af4bbbf27e9edd15321c3c"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4469678004/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "6dcf01aac0cc10fe7eb2b14d84dd83fa6db0f23870400aae0614a36fa28c7fda"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4469158155/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "2ea06ad8c78966c49010ce3b933c1fdce8414f63af899295985b0a5147adae09"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4461735120/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "e10c4a1dd79e06ee7c87c05497117d2f9334a74a2b0287c9555789bd0b0945ba"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4466032909/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "81c4bb82200477a509486f6306d8ed87ac9ef5e1d7e6f2180541a86e78dedca8"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4462459168/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "73de02dd9a8e3449b8e7a243efc8c204d9bfd8e2206fccf9768494dab5eed08b"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4465762412/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "7910fdd2bd49280237a33b026269eff4eac88010ef98b88b9fed7935b16f9e60"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4467495137/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "48bed474add0636d82342b0c59b882ac77c006be7d46646c6b21d7dfdc123850"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4446330370/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "466a9a67a7b2bb3274f2fbd25aad62b527b9beb82e8cf2bce7aedf58d5ce155d"
+    },
+    {
+      "url": "https://www.linkedin.com/jobs/view/4468030775/",
+      "status": "UNKNOWN",
+      "reason": "missing_or_ambiguous_matching_JobPosting",
+      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "content_sha256": "66302c4a071e5528814c0d3557a9d7683d124a8ad5762602b9eeb8f0c0200248"
+    }
+  ],
+  "sources": [
+    "https://www.linkedin.com/jobs/view/4444592744/",
+    "https://www.linkedin.com/jobs/view/4446330370/",
+    "https://www.linkedin.com/jobs/view/4451517903/",
+    "https://www.linkedin.com/jobs/view/4458199106/",
+    "https://www.linkedin.com/jobs/view/4461735120/",
+    "https://www.linkedin.com/jobs/view/4462153691/",
+    "https://www.linkedin.com/jobs/view/4462459168/",
+    "https://www.linkedin.com/jobs/view/4465534422/",
+    "https://www.linkedin.com/jobs/view/4465762412/",
+    "https://www.linkedin.com/jobs/view/4466032909/",
+    "https://www.linkedin.com/jobs/view/4466067489/",
+    "https://www.linkedin.com/jobs/view/4467495137/",
+    "https://www.linkedin.com/jobs/view/4467648017/",
+    "https://www.linkedin.com/jobs/view/4468030775/",
+    "https://www.linkedin.com/jobs/view/4469158155/",
+    "https://www.linkedin.com/jobs/view/4469678004/",
+    "https://www.linkedin.com/jobs/view/4470989456/",
+    "https://www.linkedin.com/jobs/view/4471511667/",
+    "https://www.linkedin.com/jobs/view/4471519449/",
+    "https://www.linkedin.com/jobs/view/4471905858/",
+    "https://www.linkedin.com/jobs/view/4473215156/",
+    "https://www.linkedin.com/jobs/view/4473216135/",
+    "https://www.linkedin.com/jobs/view/4473504607/"
+  ],
+  "pages_checked": 23,
+  "live_jobs": 0,
+  "platforms": [
+    "linkedin",
+    "indeed",
+    "welcome_to_the_jungle"
+  ],
+  "search_queries": [],
+  "query_count": 0,
+  "discovery_status": "missing_api_key",
+  "new_jobs_found": 0,
+  "jobs_closed": 0,
+  "status": "partial",
+  "mode": "live",
+  "report_file": "reports/2026-10-09T164631.807947_0000-live.md"
+}
