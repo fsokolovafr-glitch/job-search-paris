@@ -22,14 +22,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4458199106/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "29c621b32e0cf11fcbc0c9a43f4f6db4db4a5d8644dc50452a332d265eafcb67"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "2d7faa0bdb301dae806ad698b4ea2bb3a88d1c280bea752fbd58820407041ac6"
     }
   },
   {
@@ -44,13 +44,13 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4471511667/",
       "status": "UNKNOWN",
       "reason": "blocked_outside_allowed_job_pages",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
       "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
   },
@@ -66,14 +66,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4471519449/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "61b575e54adf6703831906410aba162e3b8cf823b60409d99683b15d5cd2b7bd"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "3ee2e26f2a4b6c603b34ad1058dc91fd93accb1294825c8c73d58bb8fd99b96f"
     }
   },
   {
@@ -88,14 +88,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4444592744/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "f9f5726b2b21408367b26cb386294de78401eb01c22f30e77326d4d3518bef21"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "3bc779197ca41c25ebe78279c07158b87d9bcd88a50ec9a796961de014e73300"
     }
   },
   {
@@ -121,14 +121,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4473215156/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "303952ceb92c5c082a69bdf7a7135207e5dd302b787cc7647c164ecc09601db0"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "078f8917d99ef72b1d8b5b461c12b8f16b97c644a141f7db3cdc6ce1882862dc"
     }
   },
   {
@@ -143,14 +143,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4473216135/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "3fbdf323b3d135cb8d25aa3cb7cb1e2854c894452c59ca72c3c7af3472ad8f78"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "2b991aad0643b39c9d1e5e75e3deb89fc5db722a091ef62d9f04a254a6cea959"
     }
   },
   {
@@ -176,14 +176,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4465534422/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "6cac7c9770fe28d1e2d58e910156c131b61497d38a2e1c84c31740a334934740"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "5439e2b98b7e6af5250392c2f698abd9dc323802fea82456462f6483c36d891e"
     }
   },
   {
@@ -220,14 +220,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4451517903/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "604e2ec2babaa2a6a22c4dcd912bf0b4af0d43654fdd77e3a5af66140308d1a4"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "feb4777639b6a7a809e6d2dec7df2de7f0b29a593c993efe110c14157d27916a"
     }
   },
   {
@@ -341,14 +341,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4467648017/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "6b558d992463e7c4667ed481480e132b6825c3be194e02a947ede1ef784bc7b5"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "763a17f0613188e304849f7e23d2c862dbbcaa700d721695a351a6cb148c23d1"
     }
   },
   {
@@ -363,14 +363,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4470989456/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "7ee589f4bc851e0f8a0abc141301bad7401999d08ccd4012331a5433f329d107"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "ba40faf91637048d784b8f9a226c000cf7dae394d7ac027932e9760347082448"
     }
   },
   {
@@ -385,14 +385,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4473504607/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "1c1809238b14ec5dcda77f5a3a9927d99fdc7011d2756ef6085745fb7bdad9ae"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "0e2058e04dafdf298fdf4ac00f6290eec35ded05e49d808cb130438bb20c1f0a"
     }
   },
   {
@@ -407,14 +407,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4471905858/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "b5a87253d349d29690ae2a7d927df346b2e5a503a79574ac29cba53ae1d751ff"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "93fcac869bb7c5b00b5583395a104e04dc2f482f9e067d127b7e363b2a88cd13"
     }
   },
   {
@@ -429,14 +429,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4462153691/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "df70c8de35d836b9f87203e3d647dfe1400a1a2f296fd2c87eb626b8ea928ad9"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "d751b40b1a16a1fc333d54f64eaaa899ee7be3560716761a6923ed96c37487be"
     }
   },
   {
@@ -451,14 +451,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4466067489/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "dabbd01132b9efa9120fb5744ea9d718bd47336f53af4bbbf27e9edd15321c3c"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "966063c7cfd9cfbe66ec4ea014a65337e366df25561a43b9827158bffae8711d"
     }
   },
   {
@@ -473,14 +473,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4469678004/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "6dcf01aac0cc10fe7eb2b14d84dd83fa6db0f23870400aae0614a36fa28c7fda"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "eb2c81b8379acc787a4f366bf2a18a17741fb9acece5971d0de3d048ef329a1b"
     }
   },
   {
@@ -495,14 +495,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4469158155/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "2ea06ad8c78966c49010ce3b933c1fdce8414f63af899295985b0a5147adae09"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "396dabab0b3908f30309a601400f30ec05027c7b1c2b68d4ee4b87adb73e286a"
     }
   },
   {
@@ -517,14 +517,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4461735120/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "e10c4a1dd79e06ee7c87c05497117d2f9334a74a2b0287c9555789bd0b0945ba"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "9d41bcb01d38628964ccbe6e8d230944913e5f5203477d3db9c3ccd6e2535667"
     }
   },
   {
@@ -539,14 +539,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4466032909/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "81c4bb82200477a509486f6306d8ed87ac9ef5e1d7e6f2180541a86e78dedca8"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "1383386bd0acbbeceb52b89215813d51c85a617f8026077844b3fcf73caa0bdd"
     }
   },
   {
@@ -561,14 +561,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4462459168/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "73de02dd9a8e3449b8e7a243efc8c204d9bfd8e2206fccf9768494dab5eed08b"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "e239c9612769c5b3979fce1f4f707880299d0846d9b98921db303325f48ceb45"
     }
   },
   {
@@ -583,14 +583,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4465762412/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "7910fdd2bd49280237a33b026269eff4eac88010ef98b88b9fed7935b16f9e60"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "02c2a03e47478018351ab71ab548d6510a4e2446bfe702af0e289fd514ad992d"
     }
   },
   {
@@ -605,14 +605,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4467495137/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "48bed474add0636d82342b0c59b882ac77c006be7d46646c6b21d7dfdc123850"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "09b6762c9638523356f90f600e243781fd2063f63039f7087f7925ef93069246"
     }
   },
   {
@@ -627,14 +627,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4446330370/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "466a9a67a7b2bb3274f2fbd25aad62b527b9beb82e8cf2bce7aedf58d5ce155d"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "d3832ef818125091c4a883b1a5ceeaeef87dc310dd91b6131afe7202e23aac62"
     }
   },
   {
@@ -649,14 +649,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-10-09",
+    "last_checked": "2026-10-11",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4468030775/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-10-09T16:46:31.807947+00:00",
-      "content_sha256": "66302c4a071e5528814c0d3557a9d7683d124a8ad5762602b9eeb8f0c0200248"
+      "checked_at": "2026-10-11T16:07:04.724112+00:00",
+      "content_sha256": "cbe738a0503384ce0dd7fcec6e3fb645edbe0c662d8d036b55b6b0e9f78ff471"
     }
   },
   {
