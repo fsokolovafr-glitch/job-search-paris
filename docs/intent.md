@@ -113,10 +113,13 @@ CV адаптируется без системы, статус по каждо�
 - Два вектора поиска:
   - **GROWTH**: Demand Generation, Field Marketing, Growth Marketing (приоритет, 6-8 нед.)
   - **OPS**: Marketing Operations, Marketing Automation (вторичный — если GROWTH не даст результата)
-- Целевые компании: Track C — B2B SaaS и AI-driven scale-ups.
-- Track A (Microsoft-интеграторы) — фоновый мониторинг, не приоритет.
+- Система треков компаний (как в артефакте Company Wishlist):
+  - **Track A** — основной: B2B SaaS, AI scale-ups, HealthTech, FinTech, Cyber, HRTech и другие tech-компании (Stripe, Deel, Hack The Box, Riot, Alan, Canva, Probabl и т.д.)
+  - **Track B** — вторичный: FMCG, Retail, e-commerce (HelloFresh, Raja France, Veepee, ManoMano и т.д.)
+  - **Track C** — крупный консалтинг и агентства (Capgemini, Accenture, Veeam, NielsenIQ, OMD и т.д.)
 - CV существует в двух версиях (GROWTH и OPS), собираются из Master CV.
 - Все отклики идут через fa.sokolova@gmail.com (Easy Apply на LinkedIn).
+- Company Wishlist живёт как артефакт в Claude (не в .md файле проекта).
 
 ---
 
@@ -124,7 +127,7 @@ CV адаптируется без системы, статус по каждо�
 
 - Когда возобновляется Scheduled Task мониторинга?
 - Скрапер job-scrapper-paris: текущий статус — работает или требует доработки?
-- Company Wishlist.md в проекте пустой — нужно ли его заполнять или это заменено другим файлом?
+- Company Wishlist.md в проекте пустой — подтверждено: реальный список компаний живёт в артефакте Claude (Company Wishlist artifact). Файл .md можно удалить или оставить как указатель.
 - Дашборд: нужно ли его обновить с учётом батча вакансий от 26.10?
 
 ---
