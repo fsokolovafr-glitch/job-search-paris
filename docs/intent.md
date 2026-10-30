@@ -111,8 +111,16 @@ CV адаптируется без системы, статус по каждо�
 ## 10. Known Decisions
 
 - Два вектора поиска:
-  - **GROWTH**: Demand Generation, Field Marketing, Growth Marketing (приоритет, 6-8 нед.)
-  - **OPS**: Marketing Operations, Marketing Automation (вторичный — если GROWTH не даст результата)
+
+  **Трек 1 — Marketing Ops / Automation (уклон в AI-воркфлоу)**
+  Позиционирование: строю системы, на которых работает маркетинг: CRM, автоматизации, AI-агенты и воркфлоу.
+  Названия для поиска: Marketing Operations Manager, Marketing Automation Manager, Growth Operations Manager, Marketing Ops Specialist, GTM Engineer (эксперимент).
+  Подкрепляем: OneCRM, Dynamics 365, Pardot, Salesforce, HubSpot; проекты AI Operating System, DERMATHEY, автоматизация поиска вакансий.
+
+  **Трек 2 — Growth & Demand Gen (приоритет)**
+  Позиционирование: запускаю рост с нуля — от продукта и маржи до каналов и трекинга.
+  Названия для поиска: Growth Marketing Manager, Demand Generation Manager, Field/Regional Marketing Manager, Growth & Acquisition Manager.
+  Подкрепляем: Levenhuk (ROI 3.4, лучший квартал региона за 4 года), вебинар Leica (1000+ участников, +95% к цели), Meta Ads + Google Ads Search (сертификат фев 2025).
 - Система треков компаний (как в артефакте Company Wishlist):
   - **Track A** — основной: B2B SaaS, AI scale-ups, HealthTech, FinTech, Cyber, HRTech и другие tech-компании (Stripe, Deel, Hack The Box, Riot, Alan, Canva, Probabl и т.д.)
   - **Track B** — вторичный: FMCG, Retail, e-commerce (HelloFresh, Raja France, Veepee, ManoMano и т.д.)
