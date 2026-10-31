@@ -13,4 +13,4 @@ Generated from SQLite; imported facts retain their source.
 - unknown_vacancies: 3
 - private_application_history: not_published
 
-Monitoring: {"checked_at": "2026-10-29T16:33:52.351812+00:00", "mode": "live", "status": "partial", "pages_checked": 23, "query_count": 0}
+Monitoring: {"checked_at": "2026-10-31T15:35:38.151341+00:00", "mode": "live", "status": "partial", "pages_checked": 23, "query_count": 0}
