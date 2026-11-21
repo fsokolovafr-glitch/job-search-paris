@@ -9,8 +9,8 @@ Generated from SQLite; imported facts retain their source.
 - shortlist_total: 78
 - backlog_total: 75
 - vacancy_records: 38
-- live_vacancies: 25
-- unknown_vacancies: 3
+- live_vacancies: 10
+- unknown_vacancies: 1
 - private_application_history: not_published
 
-Monitoring: {"checked_at": "2026-11-19T18:48:09.451341+00:00", "mode": "live", "status": "partial", "pages_checked": 23, "query_count": 0}
+Monitoring: {"checked_at": "2026-11-21T17:03:52.724615+00:00", "mode": "live", "status": "partial", "pages_checked": 23, "query_count": 0}
