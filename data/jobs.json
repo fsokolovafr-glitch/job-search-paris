@@ -88,14 +88,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-11-25",
+    "last_checked": "2026-11-27",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4444592744/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-11-25T19:43:10.606084+00:00",
-      "content_sha256": "b0bb99c8ac29314b9af0fcbd490fd09294d357d51bc506c557cea8df56c827ef"
+      "checked_at": "2026-11-27T19:18:53.996431+00:00",
+      "content_sha256": "7e8971241381413177cec2f740c92d6624fe6e70b5faa5ecd0b3f8fb1c44b5d1"
     }
   },
   {
@@ -220,14 +220,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-11-25",
+    "last_checked": "2026-11-27",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4451517903/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-11-25T19:43:10.606084+00:00",
-      "content_sha256": "690398503133ba6a3a7efb40271bc7d6860c0538318843b3f39db5901b4fa60b"
+      "checked_at": "2026-11-27T19:18:53.996431+00:00",
+      "content_sha256": "c9f5263d54d8badbe033c6194478cc4f592545f5f98f9c6c670dfa26ad0c245d"
     }
   },
   {
@@ -341,14 +341,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-11-25",
+    "last_checked": "2026-11-27",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4467648017/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-11-25T19:43:10.606084+00:00",
-      "content_sha256": "7fcabd06655c1c56759c2e6c34c6a6a5a389309118dcbf09d89de5d52a7761a2"
+      "checked_at": "2026-11-27T19:18:53.996431+00:00",
+      "content_sha256": "5a0f580568c6dcdff02c464c8f8277ace93bc24ed79ed2becab98c84c9a75469"
     }
   },
   {
@@ -363,14 +363,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-11-25",
+    "last_checked": "2026-11-27",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4470989456/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-11-25T19:43:10.606084+00:00",
-      "content_sha256": "b4e6899c64ae60fd69d987afebc07bcfce874e34964744b1e8b4b297f63ca1be"
+      "checked_at": "2026-11-27T19:18:53.996431+00:00",
+      "content_sha256": "e486d123261b304eaddc353595cb8b71b33bbfc7c9e72141619f526d72c5c275"
     }
   },
   {
@@ -517,14 +517,14 @@
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-11-25",
+    "last_checked": "2026-11-27",
     "last_check_status": "UNKNOWN",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4461735120/",
       "status": "UNKNOWN",
       "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-11-25T19:43:10.606084+00:00",
-      "content_sha256": "05a4303ce9765b2647e94296153473e3a4dfea4871c54093377ddf1f98805574"
+      "checked_at": "2026-11-27T19:18:53.996431+00:00",
+      "content_sha256": "63b1d21b60da41447847fbdeef87057d3d682d8cf87a58ff76beb068cb6807cb"
     }
   },
   {
@@ -643,20 +643,20 @@
     "status_basis": "user_confirmed_artifact",
     "company": "Docusign",
     "title": "Director, Demand & Field Marketing EMEA",
-    "status": "UNKNOWN",
+    "status": "CLOSED",
     "source_updated_at": "2026-09-30T00:00:00+00:00",
     "source_url": "private-reviewed-source-withheld",
     "found_date": "",
     "platform": "linkedin",
     "priority_company": true,
-    "last_checked": "2026-11-25",
-    "last_check_status": "UNKNOWN",
+    "last_checked": "2026-11-27",
+    "last_check_status": "CLOSED",
     "evidence": {
       "url": "https://www.linkedin.com/jobs/view/4468030775/",
-      "status": "UNKNOWN",
-      "reason": "missing_or_ambiguous_matching_JobPosting",
-      "checked_at": "2026-11-25T19:43:10.606084+00:00",
-      "content_sha256": "9605e9b4e7cf216fab3babfe55ef21757e0a2866d9e2fb8d11ee02043cfe9f29"
+      "status": "CLOSED",
+      "reason": "HTTP 404",
+      "checked_at": "2026-11-27T19:18:53.996431+00:00",
+      "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
   },
   {
